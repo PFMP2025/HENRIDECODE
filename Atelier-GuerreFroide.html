@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Première — Guerre froide (1947–1991)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Spectral:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous">
+<style>
+:root{
+  --bg:#0f1221; --bg2:#0b0d17;
+  --paper:#f8f9fd; --ink:#151a2e; --line:#d4daf0;
+  --usa:#2b6cb0; --urss:#c0392b; --gold:#f0b93a;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; color:var(--ink);
+  font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,sans-serif;
+  background:
+    radial-gradient(900px 500px at 15% -10%, #25316a55 0%, transparent 60%),
+    radial-gradient(800px 500px at 100% 0%, #6a254055 0%, transparent 60%),
+    linear-gradient(180deg, var(--bg), var(--bg2));
+  overflow-x:hidden;
+}
+header{padding:22px 14px 12px; text-align:center}
+.brand{
+  display:inline-flex; align-items:center; gap:14px; padding:12px 18px; border-radius:18px;
+  background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
+  border:1px solid #00000033; box-shadow:0 10px 40px rgba(0,0,0,.35), inset 0 0 0 1px #ffffff14
+}
+.cartouche{width:44px; height:44px; border-radius:12px; border:1px solid #00000066;
+  background:conic-gradient(from 0deg,#1b2a6b,#6a1b2a,#1b2a6b);
+  box-shadow:0 0 24px #5aa9ff55, inset 0 0 8px #ffffff22}
+h1{margin:0; font-family:Spectral, Georgia, serif; color:#e9efff; font-weight:700; font-size:clamp(22px,4vw,36px)}
+.subtitle{color:#cfd7ffcc; margin-top:4px}
+.container{max-width:1200px; margin:0 auto; padding:16px}
+.grid{display:grid; grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr); gap:16px}
+@media (max-width:1024px){.grid{grid-template-columns:1fr}}
+
+.paper{background:var(--paper); border:1px solid var(--line); border-radius:16px; padding:14px; box-shadow:0 12px 40px rgba(0,0,0,.35), inset 0 0 0 1px #0000000d}
+.paper h2{margin:0 0 8px 0; font-family:Spectral,Georgia,serif; color:#23305c}
+.hr{border-top:1px dashed var(--line); margin:12px 0}
+.small{color:#4b557f; font-size:12px}
+.badge{display:inline-block; padding:2px 8px; border-radius:999px; border:1px solid var(--line); background:#eef3ff; font-weight:700; font-size:12px}
+
+button,.btn{appearance:none;border:none;cursor:pointer;border-radius:12px;padding:10px 14px;color:#fff;
+background:linear-gradient(180deg,#3d5bdb,#2b49c7); border:1px solid #00000055; box-shadow:0 8px 20px rgba(0,0,0,.35), inset 0 0 12px rgba(255,255,255,.08);
+transition: transform .05s ease, box-shadow .2s ease; text-decoration:none; display:inline-block}
+button:hover,.btn:hover{box-shadow:0 12px 26px rgba(0,0,0,.5), 0 0 24px #7aa2ff55}
+button:active,.btn:active{transform:translateY(1px) scale(.995)}
+button.secondary{background:linear-gradient(180deg,#7f8bb9,#6b78a8)}
+
+/* Map */
+.mapWrap{position:relative; border:1px solid var(--line); border-radius:12px; overflow:hidden}
+#leaf{width:100%; height:460px; background:#eef3ff}
+.mapLegend{position:absolute; right:8px; top:8px; background:#ffffffd9; border:1px solid var(--line); border-radius:10px; padding:8px; font-size:12px; z-index:500}
+.mapLegend .row{display:flex; align-items:center; gap:6px; margin:4px 0}
+.dot{width:12px; height:12px; border-radius:3px; border:1px solid #00000033; display:inline-block}
+.dot.c{background:#f0b93a}
+.mapToolbar{position:absolute; left:8px; top:8px; display:flex; flex-direction:column; gap:6px; z-index:600}
+.mapToolbar button{background:#ffffffcc; color:#23305c; border:1px solid var(--line)}
+
+/* Timeline */
+#timeline{position:relative; background:#eef3ff; border:1px solid var(--line); border-radius:12px; padding:14px; overflow:hidden}
+.axis{position:relative; height:120px}
+.axis .line{position:absolute; top:58px; left:20px; right:20px; height:4px; background:linear-gradient(90deg,#cfd5ea,#c2caea); border-radius:3px; box-shadow:inset 0 0 6px #00000022}
+.tick{position:absolute; top:44px; width:1px; height:30px; background:#c9d1f1}
+.tick label{position:absolute; top:34px; transform:translateX(-50%); font-size:12px; color:#4b557f}
+.point{position:absolute; top:48px; width:14px; height:14px; border-radius:50%; border:1px solid #0b0d17aa; cursor:pointer; box-shadow:0 2px 6px #00000033}
+.point[data-type="west"]{background:#2b6cb0} .point[data-type="east"]{background:#c0392b} .point[data-type="neutre"]{background:#f0b93a}
+.point:hover{transform:scale(1.1)}
+
+/* Space Race — one shared timeline, two rockets */
+.spaceRace{display:grid; grid-template-columns:1fr 1fr; gap:12px; align-items:stretch}
+@media (max-width:1000px){.spaceRace{grid-template-columns:1fr}}
+.board{border:1px dashed var(--line); border-radius:12px; padding:8px; background:#fff}
+.pool{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:8px}
+.card{padding:8px 10px; background:#eef3ff; border:1px solid var(--line); border-radius:10px; cursor:grab; user-select:none}
+.card[data-side="urss"]{border-color:var(--urss)}
+.card[data-side="usa"]{border-color:var(--usa)}
+.card.drag{opacity:.6}
+.slots{display:grid; grid-template-columns:1fr; gap:8px}
+.slot{min-height:54px; border:1px dashed var(--line); border-radius:10px; padding:6px; background:#fafbff; color:#4b557f; display:flex; align-items:center; justify-content:space-between; gap:8px}
+.slot .idx{font-weight:800; color:#23305c; background:#eef3ff; border:1px solid var(--line); border-radius:8px; padding:4px 8px; min-width:28px; text-align:center}
+.slot .content{flex:1; min-height:24px}
+.slot.bad{animation:shake .3s linear 1}
+@keyframes shake{0%{transform:translateX(0)}25%{transform:translateX(-4px)}50%{transform:translateX(4px)}75%{transform:translateX(-3px)}100%{transform:translateX(0)}}
+.lock{display:none; font-size:12px; color:#2bb673; font-weight:700}
+.slot.locked{background:#f3fff7; border-style:solid}
+.slot.locked .lock{display:inline}
+.reset{margin-left:8px}
+
+.track{
+  position:relative; height:460px; border:1px solid var(--line); border-radius:12px; overflow:hidden;
+  background:linear-gradient(180deg,#0b0d17 0%, #121735 60%, #1e254d 100%);
+}
+.stars{position:absolute; inset:0; background-image:radial-gradient(2px 2px at 20% 30%, #ffffff 0, #ffffff00 60%),radial-gradient(1.5px 1.5px at 60% 80%, #ffffff 0, #ffffff00 60%),radial-gradient(1.8px 1.8px at 80% 20%, #ffffff 0, #ffffff00 60%); opacity:.8}
+.planet{position:absolute; bottom:-40px; left:50%; width:650px; height:650px; transform:translateX(-50%); background:radial-gradient(circle at 50% 50%, #6772b0 0%, #3b447a 55%, #232a5b 70%); border-radius:50%; filter:blur(2px); opacity:.8}
+.rockets{position:absolute; inset:0; pointer-events:none}
+.rocketWrap{position:absolute; bottom:16px; width:50%; transition: bottom .6s ease}
+.rocketWrap.left{left:10%}
+.rocketWrap.right{right:10%}
+.rocket{width:58px; height:120px; display:block; margin:0 auto}
+.rocket text{font-family:Inter,system-ui; font-size:8px; font-weight:800; fill:#0b0d17}
+.flame{position:absolute; left:50%; transform:translateX(-50%); width:16px; height:22px; bottom:-18px; background:radial-gradient(circle at 50% 0%, #fff 0%, #ffd400 25%, #ff7b00 60%, transparent 70%); border-radius:50%; animation:flame .25s infinite alternate ease-in-out; filter:blur(.5px); display:none}
+@keyframes flame{from{transform:translateX(-50%) scaleY(.9)} to{transform:translateX(-50%) scaleY(1.2)}}
+.meters{position:absolute; left:8px; top:8px; background:#ffffffdd; border:1px solid var(--line); border-radius:10px; padding:6px; font-size:12px}
+.winBanner{position:absolute; top:12px; right:12px; background:#fff; border:2px solid var(--line); border-radius:10px; padding:8px 12px; font-weight:800; display:none}
+.fireworks{position:absolute; inset:0; pointer-events:none; display:none}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="cartouche" aria-hidden="true"></div>
+    <div>
+      <h1>Guerre froide — 1947→1991</h1>
+      <div class="subtitle">Blocs, crises, détente et fin de la bipolarisation</div>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="grid">
+    <main class="paper">
+      <h2>Le cours — repères & notions</h2>
+      <div class="small"><b>Repères clés :</b> 1947 (Doctrine Truman, Plan Marshall) • 1948–49 (Blocus de Berlin) • 1955 (Pacte de Varsovie) • 1961 (Mur de Berlin) • 1962 (Crise de Cuba) • 1975 (Actes d'Helsinki) • 1979 (Afghanistan) • 1989 (Chute du mur) • 1991 (Dissolution URSS).</div>
+      <div class="hr"></div>
+
+      <h2>Carte — Lieux de crise </h2>
+      <div class="mapWrap">
+        <div id="leaf"></div>
+        <div class="mapToolbar">
+          <button class="btn" id="zoomEurope">Zoom Europe</button>
+          <button class="btn" id="zoomMonde">Monde</button>
+        </div>
+        <div class="mapLegend">
+          <div class="row"><span class="dot c"></span> Crises/points chauds</div>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+      <h2>Frise 1947 → 1991 </h2>
+      <div id="timeline">
+        <div class="axis" id="axis">
+          <div class="line"></div>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <h2>Mini‑jeu — Course à l'espace 🚀 </h2>
+      <div class="small">Glisse les 6 cartes **sans dates** sur la frise 1 → 6 (du plus ancien au plus récent).</div>
+      <div class="spaceRace">
+        <div class="board">
+          <div class="small" style="margin-bottom:6px"><b>Cartes à placer</b> — (URSS/USA mélangées)</div>
+          <div class="pool" id="pool"></div>
+          <div class="slots" id="slots">
+            <div class="slot" data-pos="0"><span class="idx">1</span> <div class="content"></div> <span class="lock">✔</span></div>
+            <div class="slot" data-pos="1"><span class="idx">2</span> <div class="content"></div> <span class="lock">✔</span></div>
+            <div class="slot" data-pos="2"><span class="idx">3</span> <div class="content"></div> <span class="lock">✔</span></div>
+            <div class="slot" data-pos="3"><span class="idx">4</span> <div class="content"></div> <span class="lock">✔</span></div>
+            <div class="slot" data-pos="4"><span class="idx">5</span> <div class="content"></div> <span class="lock">✔</span></div>
+            <div class="slot" data-pos="5"><span class="idx">6</span> <div class="content"></div> <span class="lock">✔</span></div>
+          </div>
+          
+          <div class="small" style="margin-top:8px"><button class="btn reset" id="resetRace">Réinitialiser</button></div>
+        </div>
+
+        <div class="track">
+          <div class="stars"></div>
+          <div class="planet"></div>
+          <div class="meters">
+            URSS: <b id="altURSS">0%</b> — USA: <b id="altUSA">0%</b>
+          </div>
+          <div class="winBanner" id="banner">🏁 USA passent devant avec Apollo 11 !</div>
+          <div class="rockets">
+            <div class="rocketWrap left" id="rocketURSS">
+              <svg class="rocket" viewBox="0 0 60 120" xmlns="http://www.w3.org/2000/svg" aria-label="fusée URSS">
+                <defs>
+                  <linearGradient id="gUrss" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0" stop-color="#ffffff"/>
+                    <stop offset="1" stop-color="#ffd7d7"/>
+                  </linearGradient>
+                </defs>
+                <path d="M30 5 C38 18 42 36 42 52 L42 88 L18 88 L18 52 C18 36 22 18 30 5 Z" fill="url(#gUrss)" stroke="#0b0d17" stroke-width="1"/>
+                <circle cx="30" cy="42" r="7" fill="#ff8a8a" stroke="#0b0d17" />
+                <rect x="18" y="88" width="24" height="18" rx="3" fill="#e6a1a1" stroke="#0b0d17"/>
+                <polygon points="18,88 10,100 18,100" fill="#e6a1a1" stroke="#0b0d17"/>
+                <polygon points="42,88 50,100 42,100" fill="#e6a1a1" stroke="#0b0d17"/>
+                <rect x="24" y="106" width="12" height="8" rx="2" fill="#0b0d17"/>
+                <text x="30" y="70" text-anchor="middle">URSS</text>
+              </svg>
+              <div class="flame" id="flameURSS"></div>
+            </div>
+            <div class="rocketWrap right" id="rocketUSA">
+              <svg class="rocket" viewBox="0 0 60 120" xmlns="http://www.w3.org/2000/svg" aria-label="fusée USA">
+                <defs>
+                  <linearGradient id="gUsa" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0" stop-color="#ffffff"/>
+                    <stop offset="1" stop-color="#d7e4ff"/>
+                  </linearGradient>
+                </defs>
+                <path d="M30 5 C38 18 42 36 42 52 L42 88 L18 88 L18 52 C18 36 22 18 30 5 Z" fill="url(#gUsa)" stroke="#0b0d17" stroke-width="1"/>
+                <circle cx="30" cy="42" r="7" fill="#7aa2ff" stroke="#0b0d17" />
+                <rect x="18" y="88" width="24" height="18" rx="3" fill="#9aa6d1" stroke="#0b0d17"/>
+                <polygon points="18,88 10,100 18,100" fill="#9aa6d1" stroke="#0b0d17"/>
+                <polygon points="42,88 50,100 42,100" fill="#9aa6d1" stroke="#0b0d17"/>
+                <rect x="24" y="106" width="12" height="8" rx="2" fill="#0b0d17"/>
+                <text x="30" y="70" text-anchor="middle">USA</text>
+              </svg>
+              <div class="flame" id="flameUSA"></div>
+            </div>
+          </div>
+          <canvas class="fireworks" id="fw"></canvas>
+        </div>
+
+      </div>
+
+      <div class="hr"></div>
+      <h2>Évaluation rapide (QCM)</h2>
+      <div id="qcm"></div>
+      <button id="corriger" class="secondary">Corriger</button>
+      <div id="scoreQCM" class="paper small" style="display:none; margin-top:8px"></div>
+    </main>
+
+    <aside class="paper">
+      <h2>Rappels express</h2>
+      <ul class="small">
+        <li>Bipolarisation : affrontement entre deux superpuissances (USA/URSS).</li>
+        <li>Dissuasion : « l’équilibre de la terreur » nucléaire.</li>
+        <li>Crises périphériques : Corée, Vietnam, Cuba, Afghanistan…</li>
+        <li>Détente (1962–1979), puis nouvelle tension, puis fin en 1989–1991.</li>
+      </ul>
+    </aside>
+  </div>
+</div>
+
+<div class="modal" id="modal">
+  <div class="cardz">
+    <button class="btn close" id="closeM">Fermer</button>
+    <h3 id="mTitle">Titre</h3>
+    <div class="meta"><span class="badge" id="mYear">1962</span> <span class="badge" id="mType">Est/Ouest</span></div>
+    <div id="mText"></div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
+<script>
+const $ = s => document.querySelector(s);
+
+
+const map = L.map('leaf',{scrollWheelZoom:false}).setView([30,15], 2);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:6, subdomains:'abcd', attribution:'&copy; OpenStreetMap & CARTO'}).addTo(map);
+function addCrisis(ll, label, text, year){
+  const m = L.circleMarker(ll,{radius:6, color:'#0b0d17', fillColor:'#f0b93a', fillOpacity:.95}).addTo(map);
+  m.bindPopup(`<b>${label}</b> <span class='badge'>${year}</span><br>${text}`);
+  return m;
+}
+addCrisis([52,13],'Berlin', 'Blocus (1948–49), Mur (1961–1989), ouverture en 1989.', '1948–1989');
+addCrisis([23,-82],'Cuba', 'Crise des missiles (octobre 1962).', '1962');
+addCrisis([16,106],'Vietnam', 'Guerre majeure (1965–1975).', '1965–75');
+addCrisis([35,69],'Afghanistan', 'Intervention soviétique (1979–1989).', '1979–89');
+addCrisis([40,44],'Budapest & Prague', 'Soulèvements 1956 (Hongrie) & 1968 (Tchécoslovaquie).', '1956–68');
+
+document.getElementById('zoomEurope').addEventListener('click', ()=> map.fitBounds([[72,-10],[30,40]]));
+document.getElementById('zoomMonde').addEventListener('click', ()=> map.setView([30,15], 2));
+
+
+const events = [
+  {year:1947, type:'west', title:'Doctrine Truman & Plan Marshall', text:'Endiguement et aide économique à l’Europe occidentale.'},
+  {year:1949, type:'west', title:'Création de l’OTAN', text:'Alliance militaire du bloc de l’Ouest.'},
+  {year:1949, type:'east', title:'Comecon', text:'Organisation économique du bloc de l’Est.'},
+  {year:1955, type:'east', title:'Pacte de Varsovie', text:'Alliance militaire du bloc de l’Est.'},
+  {year:1961, type:'neutre', title:'Construction du mur de Berlin', text:'Symbolise la division Est/Ouest.'},
+  {year:1962, type:'neutre', title:'Crise de Cuba', text:'Sommet de la tension nucléaire.'},
+  {year:1975, type:'neutre', title:'Actes d’Helsinki', text:'Détente et reconnaissance des frontières européennes.'},
+  {year:1979, type:'east', title:'Intervention soviétique en Afghanistan', text:'Relance des tensions.'},
+  {year:1989, type:'neutre', title:'Chute du mur de Berlin', text:'Fin de la division symbolique.'},
+  {year:1991, type:'neutre', title:'Dissolution de l’URSS', text:'Fin de la guerre froide.'}
+];
+function renderAxis(){
+  const axis = document.getElementById('axis'); axis.innerHTML = '<div class="line"></div>';
+  const min=1947, max=1991, span=max-min, w = axis.clientWidth-40;
+  for(let y=1947; y<=1991; y+=6){
+    const x = 20 + Math.round(((y-min)/span)*w);
+    const t = document.createElement('div'); t.className='tick'; t.style.left = x+'px';
+    const label = document.createElement('label'); label.textContent = y; t.appendChild(label);
+    axis.appendChild(t);
+  }
+  events.forEach(ev=>{
+    const x = 20 + Math.round(((ev.year-min)/span)*w);
+    const p = document.createElement('div'); p.className='point'; p.dataset.type=ev.type; p.style.left = (x-7)+'px';
+    p.title = ev.year+' — '+ev.title;
+    p.addEventListener('click', ()=> openModal(ev));
+    axis.appendChild(p);
+  });
+}
+function openModal(ev){
+  const t = {west:'Bloc Ouest', east:'Bloc Est', neutre:'Europe/monde'}[ev.type] || '';
+  document.getElementById('mTitle').textContent = ev.title;
+  document.getElementById('mYear').textContent = ev.year;
+  document.getElementById('mType').textContent = t;
+  document.getElementById('mText').textContent = ev.text;
+  document.getElementById('modal').style.display='flex';
+}
+document.getElementById('closeM').addEventListener('click', ()=> document.getElementById('modal').style.display='none');
+document.getElementById('modal').addEventListener('click', (e)=>{ if(e.target.id==='modal') e.currentTarget.style.display='none'; });
+window.addEventListener('resize', renderAxis);
+renderAxis();
+
+
+const ITEMS = [
+  {id:'spoutnik', label:'Spoutnik (URSS)', side:'urss'},
+  {id:'gagarine', label:'Youri Gagarine (URSS)', side:'urss'},
+  {id:'shepard', label:'Alan Shepard (USA)', side:'usa'},
+  {id:'apollo', label:'Apollo 11 (USA)', side:'usa'},
+  {id:'skylab', label:'Skylab (USA)', side:'usa'},
+  {id:'mir', label:'Station MIR (URSS)', side:'urss'}
+];
+const ORDER = ['spoutnik','gagarine','shepard','apollo','skylab','mir']; // 1..6
+
+const pool = document.getElementById('pool');
+const slots = [...document.querySelectorAll('.slot')];
+
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+function renderPool(){
+  pool.innerHTML='';
+  shuffle([...ITEMS]).forEach(ev=>{
+    const c = document.createElement('div');
+    c.className='card'; c.draggable=true; c.dataset.id=ev.id; c.dataset.side=ev.side;
+    c.textContent = ev.label;
+    c.addEventListener('dragstart', e=>{ c.classList.add('drag'); e.dataTransfer.setData('text/plain', ev.id); });
+    c.addEventListener('dragend', ()=> c.classList.remove('drag'));
+    pool.appendChild(c);
+  });
+}
+
+function clearSlots(){
+  slots.forEach(s=>{ s.classList.remove('locked'); s.querySelector('.content').textContent=''; });
+}
+
+function setupSlots(){
+  slots.forEach((s, idx)=>{
+    s.addEventListener('dragover', e=> e.preventDefault());
+    s.addEventListener('drop', e=>{
+      e.preventDefault();
+      if(s.classList.contains('locked')) return;
+      const id = e.dataTransfer.getData('text/plain');
+      const expected = ORDER[idx];
+      if(id===expected){
+        s.classList.add('locked');
+        const ev = ITEMS.find(x=>x.id===id);
+        s.querySelector('.content').textContent = ev.label;
+        const card = pool.querySelector(`.card[data-id="${id}"]`);
+        if(card) card.remove();
+        updateRace(ev.id); 
+      }else{
+        s.classList.add('bad'); setTimeout(()=> s.classList.remove('bad'),300);
+      }
+    });
+  });
+}
+
+
+const rocketURSS = document.getElementById('rocketURSS');
+const rocketUSA  = document.getElementById('rocketUSA');
+const flameURSS  = document.getElementById('flameURSS');
+const flameUSA   = document.getElementById('flameUSA');
+const altURSS    = document.getElementById('altURSS');
+const altUSA     = document.getElementById('altUSA');
+const banner     = document.getElementById('banner');
+const fw         = document.getElementById('fw');
+const ctx        = fw.getContext('2d');
+
+function setAltitude(which, pct){
+  const minBottom = 16, maxBottom = 360;
+  const bottom = minBottom + (maxBottom-minBottom) * pct;
+  const el = which==='urss'? rocketURSS : rocketUSA;
+  const flame = which==='urss'? flameURSS : flameUSA;
+  const label = which==='urss'? altURSS : altUSA;
+  el.style.bottom = bottom + 'px';
+  label.textContent = Math.round(pct*100) + '%';
+  flame.style.display = pct>0 ? 'block' : 'none';
+}
+
+function updateRace(id){
+  
+  const placed = new Set([...document.querySelectorAll('.slot.locked .content')].map(x=>x.textContent));
+  const isPlaced = (key)=> [...placed].some(t=> t.toLowerCase().includes(key));
+
+  
+  let pURSS = 0, pUSA = 0;
+
+  
+  if(isPlaced('spoutnik')) pURSS = Math.max(pURSS, 0.35);
+  if(isPlaced('gagarine')) pURSS = Math.max(pURSS, 0.6);
+
+
+  if(isPlaced('alan shepard')) pUSA = Math.max(pUSA, 0.45);
+
+  
+  if(isPlaced('apollo 11')){
+    pUSA = Math.max(pUSA, 1.0);
+    pURSS = Math.min(pURSS, 0.85);
+    showWin();
+  }
+
+  
+  if(isPlaced('skylab')) pUSA = Math.max(pUSA, 1.0);
+  if(isPlaced('mir')) pURSS = Math.max(pURSS, 0.8);
+
+  setAltitude('urss', pURSS);
+  setAltitude('usa', pUSA);
+}
+
+function showWin(){
+  banner.style.display='block';
+  fw.width = fw.clientWidth; fw.height = fw.clientHeight; fw.style.display='block';
+  const particles = [];
+  function boom(){
+    const cx = Math.random()*fw.width, cy = Math.random()*fw.height*.5 + 10;
+    const n=70; for(let i=0;i<n;i++){
+      const a = (i/n)*Math.PI*2; const sp = 2+Math.random()*3.5;
+      particles.push({x:cx,y:cy, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp, life:60+Math.random()*20});
+    }
+  }
+  let ticks=0;
+  function anim(){
+    ctx.fillStyle = 'rgba(0,0,0,0.15)';
+    ctx.fillRect(0,0,fw.width,fw.height);
+    particles.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.vy+=0.02; p.life--; });
+    particles.forEach(p=>{
+      ctx.beginPath(); ctx.arc(p.x,p.y,2,0,Math.PI*2);
+      ctx.fillStyle = 'hsl('+(p.life*3%360)+',100%,70%)'; ctx.fill();
+    });
+    for(let i=particles.length-1;i>=0;i--){ if(particles[i].life<=0) particles.splice(i,1); }
+    ticks++; if(ticks%40===0) boom();
+    if(ticks<360){ requestAnimationFrame(anim); } else { fw.style.display='none'; }
+  }
+  boom(); anim();
+}
+
+document.getElementById('resetRace').addEventListener('click', ()=>{
+  renderPool(); clearSlots();
+  setAltitude('urss', 0); setAltitude('usa', 0);
+  banner.style.display='none'; fw.style.display='none';
+});
+
+renderPool(); clearSlots(); setupSlots();
+setAltitude('urss',0); setAltitude('usa',0);
+
+
+const QUESTIONS = [
+  {q:'La doctrine Truman est proclamée en :', a:['1945','1947','1951'], c:1},
+  {q:'Le Pacte de Varsovie est créé en :', a:['1949','1955','1962'], c:1},
+  {q:'La crise de Cuba a lieu en :', a:['1961','1962','1963'], c:1},
+  {q:'Le mur de Berlin est construit en :', a:['1953','1961','1968'], c:1},
+  {q:'Les Accords d’Helsinki relèvent surtout de la période de :', a:['détente','relance des tensions','perestroïka'], c:0},
+  {q:'L’URSS intervient en Afghanistan à partir de :', a:['1975','1979','1982'], c:1},
+  {q:'La chute du mur de Berlin se produit en :', a:['1987','1988','1989'], c:2},
+  {q:'La dissolution de l’URSS intervient en :', a:['1990','1991','1992'], c:1},
+  {q:'Le Plan Marshall vise principalement :', a:['l’Europe de l’Ouest','l’Asie du Sud-Est','l’Amérique latine'], c:0},
+  {q:'La doctrine de dissuasion nucléaire repose sur :', a:['la guerre totale conventionnelle','l’équilibre de la terreur','la neutralité armée'], c:1}
+];
+function renderQCM(){
+  const root = document.getElementById('qcm'); root.innerHTML='';
+  QUESTIONS.forEach((it,idx)=>{
+    const box = document.createElement('div'); box.className='quiz-item';
+    box.innerHTML = '<div><b>Q'+(idx+1)+'.</b> '+it.q+'</div>'
+      + it.a.map((opt,i)=>'<label><input type="radio" name="q'+idx+'" value="'+i+'"> '+opt+'</label>').join('');
+    root.appendChild(box);
+  });
+}
+renderQCM();
+document.getElementById('corriger').addEventListener('click', ()=>{
+  document.querySelectorAll('.quiz-item .correct, .quiz-item .wrong').forEach(e=>e.remove());
+  let score=0;
+  QUESTIONS.forEach((it,idx)=>{
+    const sel = document.querySelector('input[name="q'+idx+'"]:checked');
+    const box = document.querySelectorAll('.quiz-item')[idx];
+    if(!sel){ box.insertAdjacentHTML('beforeend','<div class="wrong">✖ Non répondu</div>'); return; }
+    if(+sel.value===it.c){ score++; box.insertAdjacentHTML('beforeend','<div class="correct">✔ Correct</div>'); }
+    else { box.insertAdjacentHTML('beforeend','<div class="wrong">✖ Faux (bonne réponse : '+it.a[it.c]+')</div>'); }
+  });
+  const s=document.getElementById('scoreQCM'); s.style.display='block'; s.innerHTML='<b>Score :</b> '+score+'/10';
+});
+</script>
+</body>
+</html>
