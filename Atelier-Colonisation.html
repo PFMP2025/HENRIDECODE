@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Première — Colonisation & sociétés coloniales (1880–2000) </title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Spectral:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous">
+<style>
+:root{
+  --bg:#141114; --bg2:#1c1715;
+  --paper:#f7efd8; --ink:#2a2018;
+  --line:#c7b388; --gold:#b48a43;
+  --col:#8b5e34; --lut:#b9473d; --ind:#2e7d32; --mem:#2b6cb0;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0; color:var(--ink); font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,sans-serif;
+background:radial-gradient(1000px 600px at 10% -10%, #6b4f1d33 0%, transparent 60%),radial-gradient(800px 500px at 100% 0%, #8e642233 0%, transparent 60%),linear-gradient(180deg, var(--bg), var(--bg2));
+overflow-x:hidden}
+header{padding:20px 14px 12px; text-align:center}
+.brand{display:inline-flex; align-items:center; gap:14px; padding:12px 18px; border-radius:18px;
+background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02)); border:1px solid #00000033; box-shadow:0 10px 40px rgba(0,0,0,.35), inset 0 0 0 1px #ffffff14}
+.cartouche{width:44px; height:44px; background:radial-gradient(12px 12px at 30% 30%, #c79e5a 0%, transparent 70%), #2a2018; border-radius:12px; border:1px solid #00000066; box-shadow:0 0 24px #c79e5a55, inset 0 0 8px #c79e5a44}
+h1{margin:0; font-family:Spectral, Georgia, serif; color:#f6e8cd; font-weight:700; font-size:clamp(22px,4vw,36px)}
+.subtitle{color:#e8d9b8cc; margin-top:4px}
+.container{max-width:1200px; margin:0 auto; padding:16px}
+.grid{display:grid; grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr); gap:16px}
+@media (max-width:1024px){.grid{grid-template-columns:1fr}}
+
+.paper{background:var(--paper); border:1px solid var(--line); border-radius:16px; padding:14px; box-shadow:0 12px 40px rgba(0,0,0,.35), inset 0 0 0 1px #0000000d}
+.paper h2{margin:0 0 8px 0; font-family:Spectral,Georgia,serif; color:#4a3825}
+.hr{border-top:1px dashed var(--line); margin:12px 0}
+.small{color:#6b4f1d; font-size:12px}
+.badge{display:inline-block; padding:2px 8px; border-radius:999px; border:1px solid var(--line); background:#fff5dc; font-weight:700; font-size:12px}
+.kbd{background:#f6edd8; border:1px solid var(--line); border-radius:6px; padding:2px 6px; font-size:12px}
+
+button,.btn{appearance:none;border:none;cursor:pointer;border-radius:12px;padding:10px 14px;color:#fff;
+background:linear-gradient(180deg,#7a5a25,#5f4518); border:1px solid #00000055; box-shadow:0 8px 20px rgba(0,0,0,.35), inset 0 0 12px rgba(255,255,255,.08);
+transition: transform .05s ease, box-shadow .2s ease; text-decoration:none; display:inline-block}
+button:hover,.btn:hover{box-shadow:0 12px 26px rgba(0,0,0,.5), 0 0 24px #c79e5a55}
+button:active,.btn:active{transform:translateY(1px) scale(.995)}
+button.secondary{background:linear-gradient(180deg,#a68c5a,#8e7a49)}
+
+/* Map */
+.mapWrap{position:relative; border:1px solid var(--line); border-radius:12px; overflow:hidden}
+#leaf{width:100%; height:460px; background:#efe4c8}
+.mapLegend{position:absolute; right:8px; top:8px; background:#fff9f0d9; border:1px solid var(--line); border-radius:10px; padding:8px; font-size:12px; z-index:500}
+.mapLegend .row{display:flex; align-items:center; gap:6px; margin:4px 0}
+.dot{width:12px; height:12px; border-radius:3px; border:1px solid #00000033; display:inline-block}
+.dot.fr{background:#a0733f} .dot.uk{background:#c08a4b} .dot.ot{background:#d3b171}
+.mapToolbar{position:absolute; left:8px; top:8px; display:flex; flex-direction:column; gap:6px; z-index:600}
+.mapToolbar button{background:#fff9f0cc; color:#5a452f; border:1px solid var(--line)}
+.periods{position:absolute; left:8px; bottom:8px; background:#fff9f0cc; border:1px solid var(--line); border-radius:10px; padding:6px; z-index:600; font-size:12px}
+
+/* Timeline axis + points */
+#timeline{position:relative; background:#fff8e6; border:1px solid var(--line); border-radius:12px; padding:14px; overflow:hidden}
+.axis{position:relative; height:120px}
+.axis .line{position:absolute; top:58px; left:20px; right:20px; height:4px; background:linear-gradient(90deg,#d2bf96,#c7b388); border-radius:3px; box-shadow:inset 0 0 6px #00000022}
+.tick{position:absolute; top:44px; width:1px; height:30px; background:#c9b78f}
+.tick label{position:absolute; top:34px; transform:translateX(-50%); font-size:12px; color:#6b4f1d}
+.point{position:absolute; top:48px; width:14px; height:14px; border-radius:50%; border:1px solid #2a2018aa; cursor:pointer; box-shadow:0 2px 6px #00000033}
+.point[data-type="col"]{background:var(--col)} .point[data-type="lut"]{background:var(--lut)} .point[data-type="ind"]{background:var(--ind)} .point[data-type="mem"]{background:var(--mem)}
+.point:hover{transform:scale(1.1)}
+
+/* Modal zoom */
+.modal{position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; align-items:center; justify-content:center; padding:20px; z-index:1000}
+.modal .card{background:var(--paper); border:1px solid var(--line); border-radius:16px; max-width:720px; width:100%; padding:16px; box-shadow:0 24px 80px rgba(0,0,0,.5)}
+.modal h3{margin:0 0 6px 0; font-family:Spectral,serif; color:#4a3825}
+.modal .meta{display:flex; gap:8px; align-items:center; margin-bottom:8px}
+.close{float:right; background:#b9473d;}
+
+.note{background:#fff3d6; border:1px solid var(--line); border-radius:12px; padding:10px; margin:8px 0}
+.key{background:#f2e6c6; border:1px solid var(--line); border-radius:12px; padding:10px; margin:8px 0}
+
+/* DND */
+.dnd{display:flex; gap:10px; flex-wrap:wrap}
+.token{padding:6px 10px; border-radius:10px; border:1px dashed var(--line); background:#fff5dc; cursor:grab}
+.dropcols{display:grid; grid-template-columns: repeat(3,1fr); gap:10px; margin-top:8px}
+.slot{min-height:46px; border:1px dashed var(--line); border-radius:10px; padding:6px; color:#6b4f1d; background:#fff9f0}
+.score{margin-top:6px; font-weight:700}
+.reset{margin-left:8px}
+
+/* QUIZ */
+.quiz-item{border:1px solid var(--line); border-radius:12px; padding:10px; margin:8px 0; background:#fff9f0}
+.quiz-item label{display:block; margin:6px 0}
+.correct{color:#2e7d32; font-weight:700}
+.wrong{color:#c62828; font-weight:700}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="cartouche" aria-hidden="true"></div>
+    <div>
+      <h1>Colonisation & sociétés coloniales — 1880→2000</h1>
+      <div class="subtitle"></div>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="grid">
+    <main class="paper">
+      <h2>Le cours — repères & notions</h2>
+      <div class="note"><b>Repères clés :</b> 1884-85 (Conférence de Berlin) • 1914-18 (Grande Guerre) • 1931 (Exposition coloniale) • 1945-62 (décolonisations majeures) • 1960 (indépendances africaines) • 1980-2000 (mémoire & relations post-coloniales).</div>
+      <div class="key">
+        <b>Notions :</b> colonisation, empire, mise en valeur, domination, hiérarchie, “mission civilisatrice”, contestations, décolonisation, indépendance, francophonie, post-colonial.
+      </div>
+
+      <div class="hr"></div>
+      <h2>Carte — Empires & lieux clés )</h2>
+      <div class="mapWrap">
+        <div id="leaf"></div>
+        <div class="mapToolbar">
+          <button class="btn" id="zoomAfrique">Zoom Afrique</button>
+          <button class="btn" id="zoomAsie">Zoom Asie</button>
+          <button class="btn" id="zoomMonde">Monde</button>
+        </div>
+        <div class="mapLegend">
+          <div class="row"><span class="dot fr"></span> Français</div>
+          <div class="row"><span class="dot uk"></span> Britannique</div>
+          <div class="row"><span class="dot ot"></span> Autres</div>
+        </div>
+        <div class="periods">
+          Période : 
+          <label><input type="radio" name="per" value="all" checked> Toutes</label>
+          <label><input type="radio" name="per" value="1880-1914"> 1880–1914</label>
+          <label><input type="radio" name="per" value="1914-1945"> 1914–1945</label>
+          <label><input type="radio" name="per" value="1945-1965"> 1945–1965</label>
+          <label><input type="radio" name="per" value="1965-2000"> 1965–2000</label>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+      <h2>Frise 1880 → 2000 (clique un point)</h2>
+      <div id="timeline">
+        <div class="axis" id="axis">
+          <div class="line"></div>
+        </div>
+      </div>
+      
+
+      <div class="hr"></div>
+
+      <h2>Classement — Pourquoi coloniser ?</h2>
+      <div class="note">Dépose les idées. Si la colonne est correcte, le jeton disparaît et ton score monte. Plusieurs éléments par colonne.</div>
+      <div class="dnd" id="tokens">
+        <div class="token" draggable="true" data-k="eco">Matières premières (coton, caoutchouc, minerais)</div>
+        <div class="token" draggable="true" data-k="eco">Débouchés industriels (marchés de vente)</div>
+        <div class="token" draggable="true" data-k="pol">Prestige & rivalités entre puissances</div>
+        <div class="token" draggable="true" data-k="pol">Contrôle des routes stratégiques (Suez)</div>
+        <div class="token" draggable="true" data-k="cult">Mission “civilisatrice”</div>
+        <div class="token" draggable="true" data-k="cult">Diffusion de la langue et de la religion</div>
+        <div class="token" draggable="true" data-k="eco">Investissements / mise en valeur</div>
+        <div class="token" draggable="true" data-k="pol">Sécurité des frontières de l’Empire</div>
+        <div class="token" draggable="true" data-k="cult">Expositions coloniales / propagande</div>
+        <div class="token" draggable="true" data-k="eco">Main-d’œuvre à bas coût</div>
+      </div>
+      <div class="dropcols">
+        <div class="slot" data-target="eco">Économique</div>
+        <div class="slot" data-target="pol">Politique</div>
+        <div class="slot" data-target="cult">Culturel</div>
+      </div>
+      <div class="score">Score : <span id="scoreDND">0</span>/10 <button class="btn reset" id="resetDND">Réinitialiser</button></div>
+
+      <div class="hr"></div>
+      <h2>Évaluation rapide (QCM)</h2>
+      <div id="qcm"></div>
+      <button id="corriger" class="secondary">Corriger</button>
+      <div id="scoreQCM" class="note" style="display:none"></div>
+
+    </main>
+
+    <aside class="paper">
+      <h2>Images libres (SVG originaux)</h2>
+      <div class="note"><b>Affiche “Exposition coloniale 1931” :</b></div>
+      <svg viewBox="0 0 500 300" style="width:100%; display:block; border:1px solid var(--line); border-radius:12px">
+        <defs><linearGradient id="sun" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#f6d27a"/><stop offset="100%" stop-color="#d59d3a"/></linearGradient></defs>
+        <rect x="0" y="0" width="500" height="300" fill="#efe0bd"/>
+        <circle cx="380" cy="80" r="40" fill="url(#sun)"/>
+        <rect x="60" y="140" width="120" height="120" fill="#caa56c"/>
+        <rect x="200" y="160" width="60" height="100" fill="#8b5e34"/>
+        <rect x="270" y="150" width="40" height="110" fill="#b07a3d"/>
+        <text x="50" y="60" font-family="Spectral, serif" font-size="28" fill="#6b4f1d">EXPOSITION</text>
+        <text x="50" y="90" font-family="Spectral, serif" font-size="28" fill="#6b4f1d">COLONIALE</text>
+        <text x="50" y="115" font-family="Spectral, serif" font-size="16" fill="#6b4f1d">PARIS — 1931</text>
+      </svg>
+      <div class="hr"></div>
+      <div class="note"></div>
+    </aside>
+  </div>
+</div>
+
+
+<div class="modal" id="modal">
+  <div class="card">
+    <button class="btn close" id="closeM">Fermer</button>
+    <h3 id="mTitle">Titre</h3>
+    <div class="meta"><span class="badge" id="mYear">1890</span> <span class="badge" id="mType">Colonisation</span></div>
+    <div id="mText"></div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
+<script>
+const $ = s => document.querySelector(s);
+
+
+const map = L.map('leaf',{scrollWheelZoom:false}).setView([15,10], 2);
+const tiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:6, subdomains:'abcd', attribution:'&copy; OpenStreetMap & CARTO'}).addTo(map);
+const layers = {fr: L.layerGroup().addTo(map), uk: L.layerGroup().addTo(map), other: L.layerGroup().addTo(map)};
+
+function styleBy(empire, period){
+  const base = empire==='fr' ? [160,115,63] : empire==='uk' ? [192,138,75] : [211,177,113];
+  const alpha = period==='1880-1914'? .35 : period==='1914-1945'? .45 : period==='1945-1965'? .55 : .25;
+  return {color:`rgb(${base[0]-20},${base[1]-20},${base[2]-20})`, weight:1, fillColor:`rgb(${base[0]},${base[1]},${base[2]})`, fillOpacity:alpha};
+}
+function addZone(boundsOrPoly, empire, label, text, period){
+  let layer;
+  const st = styleBy(empire, period);
+  if(Array.isArray(boundsOrPoly) && Array.isArray(boundsOrPoly[0]) && typeof boundsOrPoly[0][0]==='number'){
+    layer = L.polygon(boundsOrPoly, st).addTo(layers[empire]);
+  }else{
+    layer = L.rectangle(boundsOrPoly, st).addTo(layers[empire]);
+  }
+  layer.feature = {properties:{period}};
+  layer.bindPopup(`<b>${label}</b><br><i>${period}</i><br>${text}`);
+  return layer;
+}
+
+const zones = [
+  {poly:[[ -8,27],[ -6,30],[ -1,31.5],[ 3,32],[ 6,33.5],[ 9,36],[ 6,37],[ 1,36],[-3,35.5],[-6,35],[ -8,34]], emp:'fr', lab:'Algérie', txt:'Colonie de peuplement ; fortes tensions menant à la guerre (1954–1962).', per:'1880-1914'},
+  {poly:[[68,24],[72,22],[76,18],[81,20],[85,22],[88,22.5],[89,26],[86,28.5],[82,29],[78,28],[74,26],[70,24.5]], emp:'uk', lab:'Raj britannique (Inde)', txt:'Colonie majeure ; indépendance 1947.', per:'1880-1914'},
+  {poly:[[100,14.5],[104,12],[108,13],[109,16],[108,18],[106,20],[104,19],[102,17],[100,14.5]], emp:'fr', lab:'Indochine', txt:'Union indochinoise ; guerre 1946–1954 (Genève).', per:'1914-1945'},
+  {poly:[[12,-5],[18,-4],[21,0],[20,2],[18,3],[16,2],[14,1],[12.5,-1],[12,-3],[12,-5]], emp:'other', lab:'Congo (ex. EIC/Belgique)', txt:'Exploitation caoutchouc ; scandales humanitaires.', per:'1880-1914'},
+  {poly:[[33,35],[35,32],[31,31],[29,32],[31,34]], emp:'uk', lab:'Égypte/Suez', txt:'Axe stratégique vers l’Inde ; protectorats/influence UK.', per:'1880-1914'}
+];
+zones.forEach(z=> addZone(z.poly, z.emp, z.lab, z.txt, z.per));
+
+
+function addMark(ll, label, text, year, type){
+  const m = L.circleMarker(ll,{radius:6, color:'#2a2018', fillColor:type==='col'?'#8b5e34':type==='lut'?'#b9473d':type==='ind'?'#2e7d32':'#2b6cb0', fillOpacity:.9}).addTo(map);
+  m.bindPopup(`<b>${label}</b> <span class="badge">${year}</span><br>${text}`);
+  return m;
+}
+addMark([30,32],'Canal de Suez','Route maritime clé vers l’Inde.',1869,'col');
+addMark([22,77],'Inde — indépendance', 'Retrait britannique ; Partition.',1947,'ind');
+addMark([21,105],'Indochine — accords de Genève', 'Indépendances Vietnam/Laos/Cambodge.',1954,'ind');
+addMark([28,3],'Algérie — guerre/indépendance', 'Conflit 1954–1962 ; indépendance.',1962,'ind');
+
+
+document.querySelectorAll('input[name="per"]').forEach(r=>{
+  r.addEventListener('change', ()=>{
+    const val = document.querySelector('input[name="per"]:checked').value;
+    [layers.fr, layers.uk, layers.other].forEach(g=> g.eachLayer(l=>{
+      const p = l.feature && l.feature.properties && l.feature.properties.period || 'all';
+      const show = (val==='all' || p===val);
+      if(show){ l.addTo(map); } else { map.removeLayer(l); }
+    }));
+  });
+});
+
+document.getElementById('zoomAfrique').addEventListener('click', ()=> map.fitBounds([[35,-20],[-35,55]]));
+document.getElementById('zoomAsie').addEventListener('click', ()=> map.fitBounds([[40,60],[-10,120]]));
+document.getElementById('zoomMonde').addEventListener('click', ()=> map.setView([15,10], 2));
+
+
+const events = [
+  {year:1884, type:'col', title:'Conférence de Berlin', text:'Partage des zones d’influence en Afrique entre puissances européennes.'},
+  {year:1890, type:'col', title:'Expansion française en Afrique', text:'Constitution AOF/AEF ; domination et mise en valeur.'},
+  {year:1905, type:'lut', title:'Révoltes & résistances', text:'Contestations dans plusieurs territoires (ex. Maghreb).'},
+  {year:1914, type:'lut', title:'Troupes coloniales (1914-18)', text:'Participation massive à la Grande Guerre.'},
+  {year:1931, type:'col', title:'Exposition coloniale (Paris)', text:'Mise en scène de l’Empire et propagande.'},
+  {year:1945, type:'lut', title:'Après-guerre : revendications', text:'Émeutes, mouvements nationalistes.'},
+  {year:1954, type:'ind', title:'Fin guerre d’Indochine', text:'Accords de Genève : indépendances en Asie du Sud-Est.'},
+  {year:1954, type:'ind', title:'Algérie — début du conflit', text:'Guerre 1954–1962 ; indépendance.'},
+  {year:1960, type:'ind', title:'Indépendances africaines', text:'Vague d’indépendances en Afrique sub‑saharienne.'},
+  {year:1980, type:'mem', title:'Relations post‑coloniales', text:'Coopération, migrations, francophonie.'},
+  {year:1990, type:'mem', title:'Débats mémoriels', text:'Films, débats publics, lois et polémiques.'},
+  {year:2000, type:'mem', title:'Mondialisation & mémoire', text:'Relectures historiques, échanges accrus.'}
+];
+function renderAxis(){
+  const axis = document.getElementById('axis'); axis.innerHTML = '<div class="line"></div>';
+  const min=1880, max=2000, span=max-min, w = axis.clientWidth-40;
+  
+  for(let y=1880; y<=2000; y+=10){
+    const x = 20 + Math.round(((y-min)/span)*w);
+    const t = document.createElement('div'); t.className='tick'; t.style.left = x+'px';
+    const label = document.createElement('label'); label.textContent = (y%20===0)? y : ''; t.appendChild(label);
+    axis.appendChild(t);
+  }
+ 
+  events.forEach(ev=>{
+    const x = 20 + Math.round(((ev.year-min)/span)*w);
+    const p = document.createElement('div'); p.className='point'; p.dataset.type=ev.type; p.style.left = (x-7)+'px';
+    p.title = ev.year+' — '+ev.title;
+    p.addEventListener('click', ()=> openModal(ev));
+    axis.appendChild(p);
+  });
+}
+function openModal(ev){
+  const t = {col:'Colonisation', lut:'Conflits/Contestations', ind:'Indépendances', mem:'Post‑colonial/Mémoire'}[ev.type] || '';
+  document.getElementById('mTitle').textContent = ev.title;
+  document.getElementById('mYear').textContent = ev.year;
+  document.getElementById('mType').textContent = t;
+  document.getElementById('mText').textContent = ev.text;
+  document.getElementById('modal').style.display='flex';
+}
+document.getElementById('closeM').addEventListener('click', ()=> document.getElementById('modal').style.display='none');
+document.getElementById('modal').addEventListener('click', (e)=>{ if(e.target.id==='modal') e.currentTarget.style.display='none'; });
+window.addEventListener('resize', renderAxis);
+renderAxis();
+
+
+(function initDND(){
+  let score=0, total=10;
+  const tokensWrap = document.getElementById('tokens');
+  const tokens=[...tokensWrap.querySelectorAll('.token')];
+  const slots=[...document.querySelectorAll('.slot')];
+  tokens.forEach(t=> t.addEventListener('dragstart', ev=> ev.dataTransfer.setData('text/plain', JSON.stringify({k:t.dataset.k, text:t.textContent}))));
+  slots.forEach(s=>{
+    s.addEventListener('dragover', ev=>ev.preventDefault());
+    s.addEventListener('drop', ev=>{
+      ev.preventDefault();
+      const data=JSON.parse(ev.dataTransfer.getData('text/plain'));
+      const el=[...tokensWrap.querySelectorAll('.token')].find(x=>x.textContent.trim()===data.text.trim());
+      if(!el) return;
+      if(s.dataset.target===el.dataset.k){
+        score++; document.getElementById('scoreDND').textContent=score;
+        el.remove();
+        const line=document.createElement('div'); line.className='badge'; line.textContent=data.text; line.style.margin='3px'; s.appendChild(line);
+        if(score===total) alert('Bravo ! 10/10');
+      }else{
+        s.style.animation='shk .2s linear 2'; setTimeout(()=>{ s.style.animation=''; }, 450);
+      }
+    });
+  });
+  document.getElementById('resetDND').addEventListener('click', ()=> location.reload());
+})();
+
+
+const QUESTIONS = [
+  {q:'La Conférence de Berlin (1884-85) concerne surtout…', a:['le partage colonial de l’Afrique','la création de l’UE','la fin de la traite atlantique'], c:0},
+  {q:'Un facteur ÉCONOMIQUE de la colonisation :', a:['prestige national','matières premières','mission civilisatrice'], c:1},
+  {q:'Les troupes coloniales participent massivement à :', a:['la 1ʳᵉ Guerre mondiale','la Guerre froide','la guerre de Sécession'], c:0},
+  {q:'L’Exposition coloniale de Paris a lieu en :', a:['1919','1931','1960'], c:1},
+  {q:'La guerre d’Indochine s’achève en :', a:['1954','1962','1975'], c:0},
+  {q:'La plupart des indépendances africaines ont lieu vers :', a:['1900','1960','1990'], c:1},
+  {q:'La “mission civilisatrice” relève surtout d’un registre :', a:['culturel','économique','militaire uniquement'], c:0},
+  {q:'Un enjeu stratégique majeur pour le Royaume-Uni :', a:['le canal de Suez','le détroit de Béring','le canal de Panama uniquement'], c:0},
+  {q:'Après 1962, on parle souvent de relations :', a:['post-coloniales','féodales','absolutistes'], c:0},
+  {q:'Les débats mémoriels s’intensifient surtout dans les années :', a:['1880-1900','1930-40','1980-2000'], c:2},
+];
+function renderQCM(){
+  const root = document.getElementById('qcm'); root.innerHTML='';
+  QUESTIONS.forEach((it,idx)=>{
+    const box = document.createElement('div'); box.className='quiz-item';
+    box.innerHTML = '<div><b>Q'+(idx+1)+'.</b> '+it.q+'</div>'
+      + it.a.map((opt,i)=>'<label><input type="radio" name="q'+idx+'" value="'+i+'"> '+opt+'</label>').join('');
+    root.appendChild(box);
+  });
+}
+renderQCM();
+document.getElementById('corriger').addEventListener('click', ()=>{
+  document.querySelectorAll('.quiz-item .correct, .quiz-item .wrong').forEach(e=>e.remove());
+  let score=0;
+  QUESTIONS.forEach((it,idx)=>{
+    const sel = document.querySelector('input[name="q'+idx+'"]:checked');
+    const box = document.querySelectorAll('.quiz-item')[idx];
+    if(!sel){ box.insertAdjacentHTML('beforeend','<div class="wrong">✖ Non répondu</div>'); return; }
+    if(+sel.value===it.c){ score++; box.insertAdjacentHTML('beforeend','<div class="correct">✔ Correct</div>'); }
+    else { box.insertAdjacentHTML('beforeend','<div class="wrong">✖ Faux (bonne réponse : '+it.a[it.c]+')</div>'); }
+  });
+  const s=document.getElementById('scoreQCM'); s.style.display='block'; s.innerHTML='<b>Score :</b> '+score+'/10';
+});
+</script>
+</body>
+</html>

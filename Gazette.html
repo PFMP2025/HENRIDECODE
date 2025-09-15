@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gazette du Front — 1914‑1918 (flip recto/verso • FIX)</title>
+<style>
+:root{
+  --bg:#121012; --bg2:#1a1518;
+  --paper:#f7f0dc; --ink:#222; --sep:#cbb98f;
+  --accent:#7a5a25; --accent2:#b48a43;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:linear-gradient(180deg,var(--bg),var(--bg2));color:var(--ink);font-family:Georgia,'Times New Roman',serif}
+header{padding:18px 14px;text-align:center}
+h1{color:#f4e8cd;margin:0;font-weight:700;letter-spacing:.5px}
+.sub{color:#e9d8b8;margin-top:4px}
+.container{max-width:1200px;margin:0 auto;padding:16px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:10px 0 14px}
+.btn{appearance:none;border:none;background:linear-gradient(180deg,#7a5a25,#5d4217);color:#fff;border:1px solid #00000066;border-radius:10px;padding:8px 12px;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.35),inset 0 0 10px rgba(255,255,255,.08)}
+.btn:hover{filter:brightness(1.06)}
+.btn.secondary{background:linear-gradient(180deg,#967745,#7a6238)}
+.paper{background:var(--paper);border:1px solid var(--sep);border-radius:14px;padding:14px;box-shadow:0 14px 50px rgba(0,0,0,.45),inset 0 0 0 1px #00000010}
+.note{background:#fff7e2;border:1px solid var(--sep);border-radius:10px;padding:10px;margin:10px 0}
+
+/* Book */
+.wrap{position:relative;margin:0 auto;width:min(1000px,96vw)}
+.book{position:relative;width:100%;height:720px;background:#e7d9b8;border:1px solid var(--sep);border-radius:12px;box-shadow:0 16px 60px rgba(0,0,0,.45);perspective:2400px;overflow:hidden}
+.spine{position:absolute;left:50%;top:0;bottom:0;width:8px;transform:translateX(-50%);background:linear-gradient(180deg,#cdbb97,#bfa77b);box-shadow:inset 0 0 6px rgba(0,0,0,.25);z-index:5}
+.sheet{position:absolute;top:0;bottom:0;left:50%;width:50%;transform-style:preserve-3d;transform-origin:left;transition:transform .8s ease;z-index:10}
+.sheet .front, .sheet .back{position:absolute;inset:0;background:var(--paper);backface-visibility:hidden;overflow:auto}
+.sheet .front{border-left:1px solid var(--sep);transform:rotateY(0deg)}
+.sheet .back{border-right:1px solid var(--sep);transform:rotateY(180deg)}
+/* Left static stack (already turned sheets) */
+.left-stack{position:absolute;top:0;bottom:0;right:50%;width:50%;overflow:hidden;z-index:1;background:#e7d9b8;border-right:1px solid var(--sep)}
+.left-stack .page{position:absolute;inset:0;background:var(--paper);overflow:auto}
+/* Content styles */
+.page-content{padding:24px;background:
+  radial-gradient(900px 500px at 50% -10%, rgba(255,255,255,.45), transparent 60%),
+  repeating-linear-gradient(90deg,#f7efd8 0 2px,#f3e7c9 2px 4px)}
+.page-content h2{margin:0 0 6px 0;font-size:28px}
+.dek{margin:0 0 10px 0;color:#6b4f1d}
+.cols{column-count:2;column-gap:28px;line-height:1.55;font-size:17px}
+@media (max-width:900px){ .cols{column-count:1} .book{height:760px} }
+.page-content img{max-width:100%;display:block;border:1px solid #cdbb97;border-radius:6px;margin:8px auto}
+.pnum{position:sticky;bottom:0;margin-top:10px;text-align:center;color:#6b4f1d;font-size:12px;background:linear-gradient(#f7f0dc, #f7f0dc)}
+
+/* FIX: when flipped, move the sheet to the LEFT side + rotate, so the even page is truly visible */
+.sheet.flipped{transform:translateX(-100%) rotateY(-180deg)}
+
+.hint{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-size:12px;color:#5c4a2e;opacity:.9}
+:fullscreen .book{height:92vh}
+:fullscreen .hint{display:none}
+</style>
+</head>
+<body>
+<header>
+  <h1>Gazette du Front — 1914‑1918</h1>
+  <div class="sub">Édition complète — Lettres, témoignages, presse & mémoire</div>
+</header>
+
+<div class="container paper">
+  <div class="toolbar">
+    <button class="btn" id="prevBtn">← Page précédente</button>
+    <button class="btn secondary" id="fsBtn">📖 Plein écran</button>
+    <button class="btn" id="nextBtn">Page suivante →</button>
+  </div>
+
+  <div class="wrap">
+    <div class="book" id="book">
+      <div class="left-stack" id="leftStack"><div class="page"><div class="page-content"><!-- filled dynamically --></div></div></div>
+      <div class="spine"></div>
+      
+    </div>
+    <div class="hint">Astuce : clique/tape sur les bords pour tourner. Flèches ← → du clavier actives.</div>
+  </div>
+
+  <div class="note">Correctif appliqué : les pages paires (4,6,8,…) deviennent bien visibles à gauche lors du feuilletage. Navigation possible aussi en plein écran.</div>
+</div>
+
+<script>
+const PAGES = [
+{title:"Mobilisation générale", dek:"Août 1914 — Les nations entrent en guerre", img:"https://upload.wikimedia.org/wikipedia/commons/0/0d/Mobilisation_1914.jpg", num:1, html:`<div class='cols'><p>À l’été 1914, l’attentat de Sarajevo et l’engrenage des alliances précipitent l’Europe dans la guerre. Les affiches de mobilisation couvrent les murs ; les gares bruissent du départ des régiments. Chacun pense à une guerre courte ; c’est une guerre d’usure qui s’installe.</p><p>Notre Gazette donne à lire des voix d’époque — poilus, soldats coloniaux, infirmières, presse — et la trace durable qu’a laissée le conflit dans les sociétés et les mémoires.</p></div>`},
+{title:"Lettre d’un poilu — Verdun (I)", dek:"Février 1916 — Tranchées et bombardements", img:"https://upload.wikimedia.org/wikipedia/commons/f/f4/Poilus_tranchee.jpg", num:2, html:`<div class='cols'><p><b>« Ma chère famille,</b> nous tenons depuis des jours une tranchée qui n’est plus qu’un amas de boue et de planches disjointes. Les obus creusent des entonnoirs autour de nous ; l’air est noir de fumée. La nuit, les corvées montent jusqu’aux premières lignes ; on y va deux par deux, sans parler, et l’on revient fourbus, les mains gelées.</p><p>Le capitaine dit que Verdun doit tenir. Alors on tient. J’ai perdu un camarade hier ; une rafale a balayé le boyau quand nous transportions des caisses. Je garde son carnet avec moi, pour le rendre s’il le faut. Je pense au jardin et aux poiriers. La soupe, quand elle arrive, a un goût de fête. <i>Victor</i>. »</p></div>`},
+{title:"Lettre d’un poilu — Verdun (II)", dek:"1916 — Tenir, coûte que coûte", img:"https://upload.wikimedia.org/wikipedia/commons/6/64/Verdun_battle.jpg", num:3, html:`<div class='cols'><p><b>« On dit que l’artillerie n’a jamais autant tiré.</b> Les jours se ressemblent : veille, bombardement, sommeil haché. Nous avons reçu des masques ; certains ont eu les yeux brûlés. Quand le calme revient, on entend des voix dans les trous d’obus. On hisse comme on peut les blessés ; un sergent improvisé infirmier fait ce qu’il peut.</p><p>Le vaguemestre apporte des lettres : elles font taire la peur. J’ai reconnu l’écriture de Maman : <i>“Tiens bon, mon fils.”</i> Nous ne savons pas combien de temps cela durera. Mais si Verdun tient, alors nous aurons servi à quelque chose. <i>Victor</i>. »</p></div>`},
+{title:"Tirailleurs sénégalais — Témoignage", dek:"Hiver 1917 — Froid et fraternités d’armes", img:"https://upload.wikimedia.org/wikipedia/commons/4/4c/Tirailleurs_senegalais_1917.jpg", num:4, html:`<div class='cols'><p><b>« Le vent passe à travers la capote.</b> Nous avons laissé la chaleur du pays pour venir ici, dans la boue et le gel. Mais nous ne sommes pas seuls : les camarades nous apprennent à serrer nos bandes molletières, à caler la toile de tente contre l’averse. La nuit, on écoute les sifflements au-dessus du parapet ; aux premières lueurs, on reprend la pelle.</p><p>Je garde la photographie de la cour de la maison dans ma poche. On m’a dit que nous irions en première ligne demain ; j’emporterai le gris-gris de ma mère. Quand on marche ensemble, le froid recule. Nous tiendrons. »</p></div>`},
+{title:"Indiens & troupes impériales", dek:"1915‑1918 — Le monde en guerre", img:"https://upload.wikimedia.org/wikipedia/commons/8/8d/Indian_Army_WWI_France.jpg", num:5, html:`<div class='cols'><p>Des unités venues d’Asie, d’Afrique et des dominions combattent sur plusieurs fronts. Les <b>contingents indiens</b> participent à Ypres et Neuve‑Chapelle ; leur correspondance fait circuler des images de l’Europe en guerre jusque dans les villages lointains.</p><p>La mondialisation du conflit s’accompagne de rencontres et de tensions, mais aussi de fraternités d’armes. Au terme de la guerre, ces expériences nourriront des espoirs et des revendications nouvelles.</p></div>`},
+{title:"Journal d’une infirmière", dek:"1915 — Hôpital de campagne", img:"https://upload.wikimedia.org/wikipedia/commons/6/6f/Nurse_WWI.jpg", num:6, html:`<div class='cols'><p><b>« Les brancards s’alignent jusque dans le couloir.</b> On manque de compresses ; la pharmacie n’a plus de chloroforme. Les hommes arrivent par vagues, gris de boue, le regard perdu. On coupe, on nettoie, on coud ; parfois il faut amputer. La nuit, les lampes vacillent ; on dirait qu’elles s’éteignent au rythme des canons.</p><p>J’écris leurs noms sur des étiquettes ; je glisse des lettres dans les poches lorsque je peux. Le matin, je lis leurs mots : “Dites à ma femme que…” La fatigue est une mer, mais on s’y tient. »</p></div>`},
+{title:"Les « munitionnettes »", dek:"1916‑1918 — Femmes à l’arrière", img:"https://upload.wikimedia.org/wikipedia/commons/6/69/Munitionettes_ww1.jpg", num:7, html:`<div class='cols'><p>À l’arrière, des milliers de femmes rejoignent les usines d’armement. On les appelle les <b>« munitionnettes »</b>. Elles tournent, vissent, assemblent, sous la poussière et les vapeurs. Certaines écrivent à leurs maris ; d’autres racontent la cadence, le bruit, l’odeur de l’huile et du métal chauffé.</p><p>Cette mobilisation bouscule les rôles sociaux ; après 1918, beaucoup sont renvoyées, mais l’expérience demeure et nourrira des mutations profondes.</p></div>`},
+{title:"La « Grosse Bertha » sur Paris", dek:"Mars 1918 — Civils sous le feu", img:"https://upload.wikimedia.org/wikipedia/commons/7/75/Paris_Big_Bertha.jpg", num:8, html:`<div class='cols'><p>Au printemps 1918, Paris est touché par des bombardements lointains. La presse relate la stupeur des habitants, la course aux abris, les dégâts. Les journaux publient des consignes et des hommages aux victimes.</p><p>La frontière entre front et arrière s’estompe : <b>la guerre totale</b> implique les civils, l’économie, les esprits.</p></div>`},
+{title:"Rationnement & privations", dek:"1915‑1918 — Le quotidien bouleversé", img:"https://upload.wikimedia.org/wikipedia/commons/3/3b/Food_queue_ww1_france.jpg", num:9, html:`<div class='cols'><p>On économise tout : charbon, farine, viande. Les cartes de rationnement régulent l’accès aux denrées. Les lettres racontent les files d’attente, les potagers improvisés, les solidarités de voisinage.</p><p>Cette vie mesurée, ces efforts répétés, sont la face invisible de la victoire. Ils laissent aussi des traces : habitudes, mémoires, ressentiments.</p></div>`},
+{title:"11 novembre 1918 — Armistice", dek:"La fin des combats", img:"https://upload.wikimedia.org/wikipedia/commons/1/17/Armistice_1918_signing.jpg", num:10, html:`<div class='cols'><p>À 11 heures, les armes se taisent. Les cloches sonnent ; on se presse dans les rues ; on pleure les absents. Les récits abondent : embrassades, drapeaux, mais aussi silence dans certaines maisons où l’on sait ce que la paix coûte.</p><p>La guerre n’est pas finie partout : les traités fixeront les frontières et des conflits couvent encore.</p></div>`},
+{title:"Monuments aux morts & mémoire", dek:"Années 1920 — Un nom pour chacun", img:"https://upload.wikimedia.org/wikipedia/commons/9/99/Monument_aux_morts_WWI.jpg", num:11, html:`<div class='cols'><p>Dans chaque commune s’élève un <b>monument aux morts</b>. Les cérémonies rassemblent ; on lit les noms, on dépose des gerbes. Des associations d’anciens combattants militent pour la reconnaissance des souffrances.</p><p>La mémoire est plurielle : héroïsme, deuil, dénonciation de l’absurde. Elle se transmet par les pierres, les mots et les images.</p></div>`},
+{title:"Sources & crédits", dek:"Wikimedia Commons • Gallica (BNF) • Europeana", img:"https://upload.wikimedia.org/wikipedia/commons/3/3e/BNF_logo_2015.svg", num:12, html:`<div class='cols'><p><b>Textes :</b> lettres, journaux et témoignages 1914‑1918 (fonds libres/domaine public). Voir : Gallica (gallica.bnf.fr), Europeana (europeana.eu), Wikimedia Commons (commons.wikimedia.org).</p><p><b>Images :</b> Wikimedia Commons (domaine public/licences libres). Édition pédagogique.</p></div>`}
+];
+
+const book = document.getElementById('book');
+const leftStack = document.getElementById('leftStack');
+
+function pageHTML(pg){
+  if(!pg) return '<div class="page-content"></div>';
+  return `<div class="page-content">
+    <h2>${pg.title||''}</h2>
+    <div class="dek">${pg.dek||''}</div>
+    ${pg.img? `<img src="${pg.img}" alt="">` : ''}
+    ${pg.html||''}
+    <div class="pnum">— ${pg.num||''} —</div>
+  </div>`;
+}
+
+
+function buildBook(){
+  leftStack.querySelector('.page .page-content').innerHTML = ''; // blank at start
+
+  for(let i=0;i<PAGES.length;i+=2){
+    const rightIdx = i;
+    const leftIdx  = i+1;
+
+    const sheet = document.createElement('div');
+    sheet.className = 'sheet';
+    sheet.style.zIndex = String(100 - i);
+
+    const front = document.createElement('div');
+    front.className = 'front';
+    front.innerHTML = pageHTML(PAGES[rightIdx]);
+    sheet.appendChild(front);
+
+    const back = document.createElement('div');
+    back.className = 'back';
+    back.innerHTML = pageHTML(PAGES[leftIdx]);
+    sheet.appendChild(back);
+
+    sheet.addEventListener('click', (e)=>{
+      const rect = sheet.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      if(!sheet.classList.contains('flipped') && x > rect.width*0.4){
+        flipForward(sheet, leftIdx);
+      }
+    });
+
+    book.appendChild(sheet);
+  }
+
+  leftStack.addEventListener('click', ()=> flipBack());
+}
+
+let currentSheet = -1;
+
+function flipForward(sheet, leftIdx){
+  sheet.classList.add('flipped');
+  currentSheet++;
+  const content = pageHTML(PAGES[leftIdx]);
+  leftStack.querySelector('.page').innerHTML = content;
+}
+function flipBack(){
+  if(currentSheet < 0) return;
+  const sheets = Array.from(document.querySelectorAll('.sheet'));
+  const sheet = sheets[currentSheet];
+  sheet.classList.remove('flipped');
+  currentSheet--;
+  const evenIdx = currentSheet>=0 ? (currentSheet*2 + 1) : null;
+  const html = evenIdx!=null ? pageHTML(PAGES[evenIdx]) : '<div class="page-content"></div>';
+  leftStack.querySelector('.page').innerHTML = html;
+}
+
+buildBook();
+
+
+document.getElementById('nextBtn').addEventListener('click', ()=>{
+  const sheets = Array.from(document.querySelectorAll('.sheet'));
+  const next = sheets[currentSheet+1];
+  if(next){ flipForward(next, (currentSheet+1)*2 + 1); }
+});
+document.getElementById('prevBtn').addEventListener('click', flipBack);
+
+
+document.addEventListener('keydown', (e)=>{
+  if(e.key==='ArrowRight') document.getElementById('nextBtn').click();
+  if(e.key==='ArrowLeft') document.getElementById('prevBtn').click();
+});
+
+
+document.getElementById('fsBtn').addEventListener('click', ()=>{
+  const el = document.querySelector('.wrap');
+  if(document.fullscreenElement){ document.exitFullscreen(); }
+  else { el.requestFullscreen && el.requestFullscreen(); }
+});
+</script>
+</body>
+</html>

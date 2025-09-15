@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atelier — L’entre‑deux‑guerres (1919‑1939)</title>
+<style>
+:root{
+  --bg:#0f1115; --bg2:#161a22;
+  --paper:#f4efe6; --ink:#1d1b1b; --line:#cab896;
+  --gold:#c7a76b; --gold2:#a8853f; --blue:#2a6fb6; --red:#c44b41; --green:#2e7d32;
+}
+*{box-sizing:border-box} html,body{height:100%}
+body{
+  margin:0; color:var(--ink);
+  font-family:ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  background:
+    radial-gradient(1200px 600px at 50% -10%, #1f2230 0%, transparent 60%),
+    linear-gradient(180deg, var(--bg), var(--bg2));
+  overflow-x:hidden;
+}
+header{padding:28px 14px; text-align:center}
+h1{
+  margin:0; font-weight:800; letter-spacing:.06em; text-transform:uppercase;
+  color:#f5e9ce;
+  /* Art‑Deco stroke */
+  text-shadow: 0 1px 0 #00000088, 0 0 32px #00000066;
+}
+.sub{color:#e8d9b8cc; margin-top:10px; letter-spacing:.02em}
+.container{max-width:1200px; margin:0 auto; padding:18px}
+.paper{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:18px;
+  box-shadow:0 18px 70px rgba(0,0,0,.5), inset 0 0 0 1px #00000010;
+  position:relative;
+}
+/* Art‑Deco corner ornaments */
+.paper:before,.paper:after{
+  content:""; position:absolute; width:64px; height:64px; border:2px solid var(--gold2);
+  top:-10px; border-bottom:none; border-left:none; border-radius:0 12px 0 0; opacity:.55;
+}
+.paper:before{left:-10px; transform:scaleX(-1)}
+.paper:after{right:-10px}
+
+.hr{border-top:1px dashed var(--line); margin:18px 0}
+.badge{display:inline-flex; gap:6px; align-items:center; padding:6px 10px; border-radius:999px; border:1px solid var(--line); background:#fff7dc; font-weight:700; font-size:12px}
+.kbd{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; padding:.1em .4em; border:1px solid #00000020; border-radius:6px; background:#fff}
+
+/* Buttons */
+.btn{
+  appearance:none; border:none; color:#1e1a16; cursor:pointer; font-weight:700; letter-spacing:.02em;
+  background:linear-gradient(180deg,#f6e6c2,#e5cf9b);
+  border:1px solid #00000030; border-radius:12px; padding:10px 14px;
+  box-shadow:0 6px 16px rgba(0,0,0,.35), inset 0 0 10px rgba(255,255,255,.08);
+}
+.btn:hover{filter:brightness(1.05)}
+
+/* Timeline */
+#timeline{position:relative; background:#fff8ea; border:1px solid var(--line); border-radius:14px; padding:16px; overflow:hidden}
+.axis{position:relative; height:160px}
+.axis .line{
+  position:absolute; top:78px; left:26px; right:26px; height:6px;
+  background:linear-gradient(90deg,#d8c59a,#b79450); border-radius:4px;
+  box-shadow:inset 0 0 8px #00000022;
+}
+.tick{position:absolute; top:58px; width:1px; height:44px; background:#c9b78f}
+.tick label{position:absolute; top:44px; transform:translateX(-50%); font-size:12px; color:#6b4f1d}
+.point{
+  position:absolute; top:64px; width:18px; height:18px; border-radius:50%;
+  border:1px solid #2a2018aa; cursor:pointer; box-shadow:0 2px 6px #00000033;
+  outline:2px solid #0000; transition:transform .15s ease, outline-color .15s ease;
+}
+.point[data-t="eco"]{background:#2e7d32} .point[data-t="pol"]{background:#2a6fb6} .point[data-t="soc"]{background:#c44b41}
+.point:hover{transform:scale(1.12); outline-color:#00000020}
+
+/* Modal */
+.modal{position:fixed; inset:0; background:rgba(12,10,10,.6); display:none; align-items:center; justify-content:center; padding:20px; z-index:1000}
+.modal .card{
+  background:var(--paper); border:1px solid var(--line); border-radius:18px; max-width:900px; width:100%; padding:18px;
+  box-shadow:0 24px 90px rgba(0,0,0,.55)
+}
+.modal h3{margin:0 0 6px 0; font-family:Georgia,serif; color:#3d3028; letter-spacing:.02em}
+.modal .meta{display:flex; gap:8px; align-items:center; margin-bottom:10px}
+.close{float:right; background:#c44b41; color:#fff; border:none; border-radius:12px; padding:8px 12px; cursor:pointer}
+
+/* Drag & drop */
+.dd-wrap{display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-top:10px}
+.dd-col{background:#fffefa; border:1px dashed #ccb98f; border-radius:12px; min-height:140px; padding:12px}
+.dd-col h4{margin:0 0 8px 0; font-family:Georgia,serif; color:#6b4f1d; letter-spacing:.02em}
+.token{background:#fff; border:1px solid #ccb98f; border-radius:999px; padding:8px 12px; display:inline-block; margin:6px; cursor:grab; box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.pool{background:#fffdf3; padding:12px; border:1px solid #ccb98f; border-radius:12px}
+#ddScore{margin-top:10px}
+
+/* Quiz */
+.quiz-item{border:1px solid var(--line); border-radius:12px; padding:12px; margin:8px 0; background:#fff9f0}
+.quiz-item label{display:block; margin:6px 0}
+.correct{color:#2e7d32; font-weight:700}
+.wrong{color:#c62828; font-weight:700}
+
+@media (max-width:900px){
+  .dd-wrap{grid-template-columns:1fr}
+  .axis .line{left:18px; right:18px}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Atelier — L’entre‑deux‑guerres (1919‑1939)</h1>
+  <div class="sub">Crises, démocraties fragilisées, totalitarismes <span style="color:#f0d9a8"></span></div>
+</header>
+
+<div class="container">
+  <section class="paper">
+    <h2>1) Objectifs & repères</h2>
+    <p>À l’issue de l’atelier, tu dois savoir : <b>dater</b> les grandes étapes (1919, 1929, 1933, 1936, 1939), <b>caractériser</b> les régimes totalitaires (URSS, Italie fasciste, Allemagne nazie) et <b>expliquer</b> comment la crise de 1929 fragilise les démocraties et favorise les solutions autoritaires.</p>
+    <div class="badge">Thèmes : <b style="color:var(--green)">économie</b> • <b style="color:var(--blue)">politique</b> • <b style="color:var(--red)">société</b></div>
+  </section>
+
+  <section class="paper">
+    <h2>2) Frise 1919 → 1939 (clique un point)</h2>
+    <div id="timeline"><div class="axis" id="axis"><div class="line"></div></div></div>
+    <div class="hr"></div>
+    <div class="small">Couleurs : <span class="badge">vert</span> = économie • <span class="badge">bleu</span> = politique • <span class="badge">rouge</span> = société. Astuce : tu peux aussi utiliser les flèches <span class="kbd">←</span> <span class="kbd">→</span> pour naviguer point par point.</div>
+  </section>
+
+  <section class="paper">
+    <h2>3) Classer les mesures & événements</h2>
+    <p>Glisse chaque jeton dans la bonne colonne (<b>Économique</b>, <b>Politique</b>, <b>Social</b>). Score immédiat.</p>
+    <div class="pool" id="pool"></div>
+    <div class="dd-wrap">
+      <div class="dd-col" data-col="eco"><h4>Économique</h4></div>
+      <div class="dd-col" data-col="pol"><h4>Politique</h4></div>
+      <div class="dd-col" data-col="soc"><h4>Social</h4></div>
+    </div>
+    <div id="ddScore" class="badge"></div>
+  </section>
+
+  <section class="paper">
+    <h2>4) QCM — 10 questions</h2>
+    <div id="qcm"></div>
+    <button id="corriger" class="btn">Corriger</button>
+    <span id="scoreQCM" class="badge" style="display:none;margin-left:8px"></span>
+  </section>
+</div>
+
+
+<div class="modal" id="modal">
+  <div class="card">
+    <button class="close" id="closeM">Fermer</button>
+    <h3 id="mTitle">Titre</h3>
+    <div class="meta"><span class="badge" id="mYear">1933</span> <span class="badge" id="mType">Politique</span></div>
+    <div id="mText"></div>
+  </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+
+/* ===== Timeline ===== */
+const TL = [
+  {year:1919, t:'pol', title:'Traité de Versailles', text:'Paix imposée à l’Allemagne : réparations, pertes territoriales, SDN.'},
+  {year:1922, t:'pol', title:'Marche sur Rome', text:'Mussolini au pouvoir en Italie : naissance d’un régime fasciste.'},
+  {year:1924, t:'pol', title:'URSS de Staline', text:'Lutte de pouvoir puis consolidation d’un régime totalitaire.'},
+  {year:1929, t:'eco', title:'Krach de Wall Street', text:'Crise financière → crise économique mondiale (chômage, faillites).'},
+  {year:1933, t:'pol', title:'Hitler chancelier', text:'Nazification de l’État, suppression des libertés, antisémitisme d’État.'},
+  {year:1934, t:'soc', title:'Émeutes & ligues en France', text:'Crise politique et sociale (6 février).'},
+  {year:1935, t:'pol', title:'Lois de Nuremberg', text:'Exclusion et persécution des Juifs d’Allemagne.'},
+  {year:1936, t:'soc', title:'Front populaire (France)', text:'Congés payés, 40 h, conventions collectives.'},
+  {year:1936, t:'pol', title:'Guerre d’Espagne', text:'Coup d’État franquiste → guerre civile, brigades internationales.'},
+  {year:1938, t:'pol', title:'Accords de Munich', text:'Désarmement diplomatique face à Hitler ; annexion des Sudètes.'},
+  {year:1939, t:'pol', title:'Invasion de la Pologne', text:'Début de la Seconde Guerre mondiale en Europe.'}
+];
+
+let currentIndex = 0;
+function renderAxis(){
+  const axis = document.getElementById('axis'); axis.innerHTML = '<div class="line"></div>';
+  const min=1919, max=1939, span=max-min, w = axis.clientWidth-52;
+  for(let y=min; y<=max; y+=2){
+    const x = 26 + Math.round(((y-min)/span)*w);
+    const t = document.createElement('div'); t.className='tick'; t.style.left = x+'px';
+    const label = document.createElement('label'); label.textContent = y; t.appendChild(label);
+    axis.appendChild(t);
+  }
+  TL.forEach((ev,idx)=>{
+    const x = 26 + Math.round(((ev.year-min)/span)*w);
+    const p = document.createElement('div'); p.className='point'; p.dataset.t=ev.t; p.style.left = (x-9)+'px';
+    p.title = ev.year+' — '+ev.title;
+    p.addEventListener('click', ()=> { currentIndex=idx; openModal(ev);});
+    axis.appendChild(p);
+  });
+}
+function openModal(ev){
+  const typeMap = {eco:'Économie', pol:'Politique', soc:'Société'};
+  $('#mTitle').textContent = ev.title;
+  $('#mYear').textContent = ev.year;
+  $('#mType').textContent = typeMap[ev.t]||'';
+  $('#mText').innerHTML = '<p>'+ev.text+'</p>';
+  $('#modal').style.display='flex';
+}
+$('#closeM').addEventListener('click', ()=> $('#modal').style.display='none');
+$('#modal').addEventListener('click', (e)=>{ if(e.target.id==='modal') e.currentTarget.style.display='none'; });
+window.addEventListener('resize', renderAxis);
+document.addEventListener('keydown', (e)=>{
+  if(document.getElementById('modal').style.display!=='flex') return;
+  if(e.key==='ArrowRight'){ currentIndex = Math.min(currentIndex+1, TL.length-1); openModal(TL[currentIndex]); }
+  if(e.key==='ArrowLeft'){ currentIndex = Math.max(currentIndex-1, 0); openModal(TL[currentIndex]); }
+});
+renderAxis();
+
+
+const TOKENS = [
+  {txt:'Baisse des salaires / chômage massif', cat:'eco'},
+  {txt:'Dévaluation du franc (1936)', cat:'eco'},
+  {txt:'Politiques de grands travaux', cat:'eco'},
+  {txt:'Lois de Nuremberg (1935)', cat:'pol'},
+  {txt:'Suppression des libertés (Allemagne/Italie/URSS)', cat:'pol'},
+  {txt:'Accords de Munich (1938)', cat:'pol'},
+  {txt:'Congés payés / 40h', cat:'soc'},
+  {txt:'Ligues / violences de rue', cat:'soc'},
+  {txt:'Brigades internationales (Espagne)', cat:'soc'},
+];
+const pool = document.getElementById('pool');
+const cols = document.querySelectorAll('.dd-col');
+let score=0, total=TOKENS.length;
+
+TOKENS.forEach((t,i)=>{
+  const el=document.createElement('div');
+  el.className='token'; el.draggable=true; el.textContent=t.txt; el.dataset.cat=t.cat; el.id='tok'+i;
+  el.addEventListener('dragstart', e=> e.dataTransfer.setData('text/plain', el.id));
+  pool.appendChild(el);
+});
+cols.forEach(c=>{
+  c.addEventListener('dragover', e=> e.preventDefault());
+  c.addEventListener('drop', e=>{
+    e.preventDefault();
+    const id=e.dataTransfer.getData('text/plain');
+    const el=document.getElementById(id);
+    if(!el) return;
+    const ok = (el.dataset.cat === c.dataset.col);
+    if(ok){
+      c.appendChild(el);
+      el.draggable=false; el.style.opacity=.6;
+      score++; document.getElementById('ddScore').textContent = 'Score : '+score+' / '+total;
+      if(score===total){ document.getElementById('ddScore').textContent += ' — Bravo !'; }
+    }else{
+      el.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(0)'}], {duration:300});
+    }
+  });
+});
+
+
+const QUESTIONS = [
+  {q:'Le traité de Versailles est signé en :', a:['1919','1921','1923'], c:0},
+  {q:'La crise de 1929 démarre :', a:['à Berlin','à New York','à Londres'], c:1},
+  {q:'Hitler devient chancelier en :', a:['1932','1933','1934'], c:1},
+  {q:'Les “lois de Nuremberg” visent surtout :', a:['les opposants politiques','les Juifs d’Allemagne','les étrangers en général'], c:1},
+  {q:'Le Front populaire arrive au pouvoir en France en :', a:['1934','1935','1936'], c:2},
+  {q:'La guerre d’Espagne commence en :', a:['1935','1936','1937'], c:1},
+  {q:'Les accords de Munich concernent :', a:['la Rhénanie','les Sudètes','la Pologne'], c:1},
+  {q:'Un trait du régime totalitaire :', a:['pluralisme des partis','culte du chef','séparation stricte des pouvoirs'], c:1},
+  {q:'Une réponse sociale du Front populaire :', a:['Semaine de 30 h','Congés payés','Suppression des syndicats'], c:1},
+  {q:'En 1939, la guerre en Europe commence par :', a:['l’invasion de la Pologne','l’attaque de la France','la bataille d’Angleterre'], c:0},
+];
+function renderQCM(){
+  const root = document.getElementById('qcm'); root.innerHTML='';
+  QUESTIONS.forEach((it,idx)=>{
+    const box = document.createElement('div'); box.className='quiz-item';
+    box.innerHTML = '<div><b>Q'+(idx+1)+'.</b> '+it.q+'</div>'
+      + it.a.map((opt,i)=>'<label><input type="radio" name="q'+idx+'" value="'+i+'"> '+opt+'</label>').join('');
+    root.appendChild(box);
+  });
+}
+renderQCM();
+document.getElementById('corriger').addEventListener('click', ()=>{
+  document.querySelectorAll('.quiz-item .correct, .quiz-item .wrong').forEach(e=>e.remove());
+  let score=0;
+  QUESTIONS.forEach((it,idx)=>{
+    const sel = document.querySelector('input[name="q'+idx+'"]:checked');
+    const box = document.querySelectorAll('.quiz-item')[idx];
+    if(!sel){ box.insertAdjacentHTML('beforeend','<div class="wrong">✖ Non répondu</div>'); return; }
+    if(+sel.value===it.c){ score++; box.insertAdjacentHTML('beforeend','<div class="correct">✔ Correct</div>'); }
+    else { box.insertAdjacentHTML('beforeend','<div class="wrong">✖ Faux (bonne réponse : '+it.a[it.c]+')</div>'); }
+  });
+  const s=document.getElementById('scoreQCM'); s.style.display='inline-flex'; s.innerHTML='<b>Score :</b> '+score+'/10';
+});
+</script>
+</body>
+</html>

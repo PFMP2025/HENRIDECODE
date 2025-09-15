@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Première — La Première Guerre mondiale : expérience combattante &amp; mémoire (v1)</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&amp;family=Spectral:wght@500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#131116; --bg2:#1b1720;
+  --paper:#f7f3ea; --ink:#231f20;
+  --line:#c9bba4; --gold:#b48a43;
+  --col:#8b5e34; --lut:#b9473d; --ind:#2e7d32; --mem:#2b6cb0;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0; color:var(--ink); font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,sans-serif;
+background:radial-gradient(900px 600px at 10% -10%, #6b4f1d33 0%, transparent 60%),radial-gradient(800px 500px at 100% 0%, #8e642233 0%, transparent 60%),linear-gradient(180deg, var(--bg), var(--bg2)); overflow-x:hidden}
+header{padding:20px 14px 12px; text-align:center}
+.brand{display:inline-flex; align-items:center; gap:14px; padding:12px 18px; border-radius:18px;
+background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02)); border:1px solid #00000033; box-shadow:0 10px 40px rgba(0,0,0,.35), inset 0 0 0 1px #ffffff14}
+.cartouche{width:44px; height:44px; background:radial-gradient(12px 12px at 30% 30%, #c79e5a 0%, transparent 70%), #2a2018; border-radius:12px; border:1px solid #00000066; box-shadow:0 0 24px #c79e5a55, inset 0 0 8px #c79e5a44}
+h1{margin:0; font-family:Spectral, Georgia, serif; color:#f6e8cd; font-weight:700; font-size:clamp(22px,4vw,36px)}
+.subtitle{color:#e8d9b8cc; margin-top:4px}
+.container{max-width:1200px; margin:0 auto; padding:16px}
+.grid{display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr); gap:16px}
+@media (max-width:1024px){.grid{grid-template-columns:1fr}}
+
+.paper{background:var(--paper); border:1px solid var(--line); border-radius:16px; padding:14px; box-shadow:0 12px 40px rgba(0,0,0,.35), inset 0 0 0 1px #0000000d}
+.paper h2{margin:0 0 8px 0; font-family:Spectral,Georgia,serif; color:#3d3028}
+.hr{border-top:1px dashed var(--line); margin:12px 0}
+.small{color:#6b4f1d; font-size:12px}
+.badge{display:inline-block; padding:2px 8px; border-radius:999px; border:1px solid var(--line); background:#fff5dc; font-weight:700; font-size:12px}
+
+button,.btn{appearance:none;border:none;cursor:pointer;border-radius:12px;padding:10px 14px;color:#fff;
+background:linear-gradient(180deg,#7a5a25,#5f4518); border:1px solid #00000055; box-shadow:0 8px 20px rgba(0,0,0,.35), inset 0 0 12px rgba(255,255,255,.08);
+transition: transform .05s ease, box-shadow .2s ease; text-decoration:none; display:inline-block}
+button:hover,.btn:hover{box-shadow:0 12px 26px rgba(0,0,0,.5), 0 0 24px #c79e5a55}
+button:active,.btn:active{transform:translateY(1px) scale(.995)}
+button.secondary{background:linear-gradient(180deg,#a68c5a,#8e7a49)}
+
+/* Map */
+.mapWrap{position:relative; border:1px solid var(--line); border-radius:12px; overflow:hidden}
+#leaf{width:100%; height:460px; background:#efe4c8}
+.mapLegend{position:absolute; right:8px; top:8px; background:#fff9f0d9; border:1px solid var(--line); border-radius:10px; padding:8px; font-size:12px; z-index:500}
+.mapLegend .row{display:flex; align-items:center; gap:6px; margin:4px 0}
+.mapToolbar{position:absolute; left:8px; top:8px; display:flex; flex-direction:column; gap:6px; z-index:600}
+.mapToolbar button{background:#fff9f0cc; color:#5a452f; border:1px solid var(--line)}
+.loader{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); background:#fff9f0; padding:8px 12px; border:1px solid var(--line); border-radius:8px; z-index:550; display:none}
+
+/* Timeline axis + points */
+#timeline{position:relative; background:#fff8e6; border:1px solid var(--line); border-radius:12px; padding:14px; overflow:hidden}
+.axis{position:relative; height:120px}
+.axis .line{position:absolute; top:58px; left:20px; right:20px; height:4px; background:linear-gradient(90deg,#d2bf96,#c7b388); border-radius:3px; box-shadow:inset 0 0 6px #00000022}
+.tick{position:absolute; top:44px; width:1px; height:30px; background:#c9b78f}
+.tick label{position:absolute; top:34px; transform:translateX(-50%); font-size:12px; color:#6b4f1d}
+.point{position:absolute; top:48px; width:14px; height:14px; border-radius:50%; border:1px solid #2a2018aa; cursor:pointer; box-shadow:0 2px 6px #00000033}
+.point[data-type="bat"]{background:#8b5e34} .point[data-type="pol"]{background:#2b6cb0} .point[data-type="mem"]{background:#b9473d}
+.point:hover{transform:scale(1.1)}
+
+/* Modal zoom */
+.modal{position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; align-items:center; justify-content:center; padding:20px; z-index:1000}
+.modal .card{background:var(--paper); border:1px solid var(--line); border-radius:16px; max-width:720px; width:100%; padding:16px; box-shadow:0 24px 80px rgba(0,0,0,.5)}
+.modal h3{margin:0 0 6px 0; font-family:Spectral,serif; color:#3d3028}
+.modal .meta{display:flex; gap:8px; align-items:center; margin-bottom:8px}
+.close{float:right; background:#b9473d;}
+
+/* QUIZ */
+.quiz-item{border:1px solid var(--line); border-radius:12px; padding:10px; margin:8px 0; background:#fff9f0}
+.quiz-item label{display:block; margin:6px 0}
+.correct{color:#2e7d32; font-weight:700}
+.wrong{color:#c62828; font-weight:700}
+
+/* Gazette iframe sizing on small screens */
+@media (max-width:700px){
+  iframe[title="Gazette du Front 1914‑1918"]{ height: 86vh !important; }
+}</style>
+</head>
+<body>
+<header>
+<div class="brand">
+<div aria-hidden="true" class="cartouche"></div>
+<div>
+<h1>Première Guerre mondiale — expérience combattante &amp; mémoire</h1>
+<div class="subtitle">Frise 1914–1918 • Carte interactive • Lettres de poilus (adaptées) • QCM</div>
+</div>
+</div>
+</header>
+<div class="container">
+<div class="grid">
+<main class="paper">
+<h2>1) Frise 1914 → 1918 (clique un point)</h2>
+<div id="timeline"><div class="axis" id="axis"><div class="line"></div></div></div>
+<div class="small">Couleurs : <b>brun</b> = bataille, <b>bleu</b> = politique/diplomatie, <b>rouge</b> = mémoire.</div>
+<div class="hr"></div>
+<h2>2) Carte — Fronts &amp; grandes batailles</h2>
+<div class="mapWrap">
+<div id="leaf"></div>
+<div class="mapToolbar">
+<button class="btn" id="zoomFrontOuest">Front Ouest</button>
+<button class="btn" id="zoomFrontEst">Front Est</button>
+<button class="btn" id="zoomMonde">Monde</button>
+</div>
+<div class="loader" id="loader">Chargement du fond…</div>
+<div class="mapLegend">
+<div class="row"><span class="badge">★</span> Grandes batailles (popup + année)</div>
+</div>
+</div>
+<div class="hr"></div><h2>3) Gazette du Front — 1914‑1918 (feuilletable)</h2><h2>4) QCM — 10 questions</h2><div id="qcm"></div><button class="secondary" id="corriger">Corriger</button><div class="note" id="scoreQCM" style="display:none; background:#fff9f0; border:1px solid var(--line); border-radius:12px; padding:10px; margin-top:8px"></div><div class="hr"></div>
+<div class="small">Feuillette la gazette (12 pages). Clique sur 📖 Plein écran dans la gazette pour lire confortablement.</div>
+
+
+
+<div></div><div class="paper" style="background:#fffdf6; padding:0; overflow:hidden"><iframe allow="fullscreen" allowfullscreen="" loading="lazy" src="Gazette.html" style="width:100%; height:820px; border:0; display:block" title="Gazette du Front 1914‑1918"></iframe><div style="display:flex; gap:8px; align-items:center; justify-content:flex-end; padding:8px 10px; border-top:1px dashed #c9bba4; background:#fffaf0"><a class="btn" href="Gazette.html" target="_blank">🔗 Ouvrir la Gazette dans un onglet</a></div></div><div class="hr"></div></main>
+<aside class="paper">
+<h2>Repères &amp; notions</h2>
+<ul>
+<li><b>Violence de masse</b> : armes nouvelles, bombardements, civils touchés.</li>
+<li><b>Expérience combattante</b> : tranchées, fatigue, blessures, permissions.</li>
+<li><b>Propagande</b> &amp; <b>censure</b>.</li>
+<li><b>Guerre totale</b> : mobilisation économique et morale.</li>
+<li><b>Mémoires</b> : monuments, cérémonies, écrits, débats.</li>
+</ul>
+<div class="hr"></div>
+
+</aside>
+</div>
+</div>
+
+<div class="modal" id="modal">
+<div class="card">
+<button class="btn close" id="closeM">Fermer</button>
+<h3 id="mTitle">Titre</h3>
+<div class="meta"><span class="badge" id="mYear">1916</span> <span class="badge" id="mType">Bataille</span></div>
+<div id="mText"></div>
+</div>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+
+
+const events = [
+  {year:1914, type:'pol', title:'Ultimatum & engrenage des alliances', text:'Juillet 1914 : crises diplomatiques, mobilisation générale.'},
+  {year:1914, type:'bat', title:'Première bataille de la Marne', text:'Septembre 1914 : arrêt de l’avance allemande, “course à la mer”.'},
+  {year:1915, type:'bat', title:'Ypres (gaz)', text:'Avril 1915 : premiers gaz à grande échelle sur le front Ouest.'},
+  {year:1915, type:'bat', title:'Dardanelles / Gallipoli', text:'1915–1916 : opération alliée infructueuse contre l’Empire ottoman.'},
+  {year:1916, type:'bat', title:'Verdun', text:'Fév.–déc. 1916 : 300 jours de combats, symbole d’acharnement.'},
+  {year:1916, type:'bat', title:'Somme', text:'Juil.–nov. 1916 : offensive alliée, pertes très lourdes.'},
+  {year:1917, type:'pol', title:'Entrée en guerre des États‑Unis', text:'Avril 1917 : bascule stratégique du conflit.'},
+  {year:1917, type:'pol', title:'Révolutions russes', text:'1917 : chute du tsar, prise de pouvoir bolchevique, retrait progressif.'},
+  {year:1918, type:'bat', title:'Offensives du printemps', text:'1918 : tentatives allemandes avant l’arrivée massive des troupes US.'},
+  {year:1918, type:'pol', title:'Armistice', text:'11 novembre 1918 : fin des combats sur le front Ouest.'},
+  {year:1919, type:'mem', title:'Traité de Versailles', text:'28 juin 1919 : paix imposée à l’Allemagne, mémoires conflictuelles.'},
+];
+function renderAxis(){
+  const axis = document.getElementById('axis'); axis.innerHTML = '<div class="line"></div>';
+  const min=1914, max=1919, span=max-min, w = axis.clientWidth-40;
+  for(let y=1914; y<=1919; y+=1){
+    const x = 20 + Math.round(((y-min)/span)*w);
+    const t = document.createElement('div'); t.className='tick'; t.style.left = x+'px';
+    const label = document.createElement('label'); label.textContent = y; t.appendChild(label);
+    axis.appendChild(t);
+  }
+  events.forEach(ev=>{
+    const x = 20 + Math.round(((ev.year-min)/span)*w);
+    const p = document.createElement('div'); p.className='point'; p.dataset.type=ev.type; p.style.left = (x-7)+'px';
+    p.title = ev.year+' — '+ev.title;
+    p.addEventListener('click', ()=> openModal(ev));
+    axis.appendChild(p);
+  });
+}
+function openModal(ev){
+  const t = {bat:'Bataille', pol:'Politique/Diplomatie', mem:'Mémoire'}[ev.type] || '';
+  $('#mTitle').textContent = ev.title;
+  $('#mYear').textContent = ev.year;
+  $('#mType').textContent = t;
+  $('#mText').textContent = ev.text;
+  $('#modal').style.display='flex';
+}
+$('#closeM').addEventListener('click', ()=> $('#modal').style.display='none');
+$('#modal').addEventListener('click', (e)=>{ if(e.target.id==='modal') e.currentTarget.style.display='none'; });
+window.addEventListener('resize', renderAxis);
+renderAxis();
+
+
+const map = L.map('leaf',{scrollWheelZoom:false}).setView([49, 4], 5);
+const providers = [
+  { url:'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', opts:{maxZoom:8, subdomains:'abcd', attribution:'© OpenStreetMap © CARTO'} },
+  { url:'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', opts:{maxZoom:8, attribution:'© OpenStreetMap'} },
+  { url:'https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png', opts:{maxZoom:8, attribution:'© OpenStreetMap & Wikipedia'} }
+];
+let base, idx=0; const loader=$('#loader');
+function tryNext(){
+  if(base){ map.removeLayer(base); }
+  if(idx >= providers.length){ loader.style.display='none'; return; }
+  const p = providers[idx++];
+  base = L.tileLayer(p.url, p.opts).addTo(map);
+  loader.style.display='block';
+  let ok=false;
+  base.on('tileload', ()=>{ ok=true; loader.style.display='none'; });
+  base.on('tileerror', ()=>{ if(!ok) tryNext(); });
+}
+tryNext();
+
+
+function battle(lat, lng, title, year, text){
+  const m = L.marker([lat,lng]).addTo(map);
+  m.bindPopup(`<b>${title}</b> <span class="badge">${year}</span><br>${text}`);
+  return m;
+}
+battle(49.2,3.0,'Marne',1914,'Arrêt de l’offensive allemande près de Paris.');
+battle(50.85,2.89,'Ypres',1915,'Gaz utilisés à grande échelle sur le front Ouest.');
+battle(49.21,5.39,'Verdun',1916,'Bataille d’usure, symbole de la guerre industrielle.');
+battle(50.02,2.65,'Somme',1916,'Offensive alliée : pertes massives pour un gain limité.');
+battle(40.22,26.29,'Dardanelles / Gallipoli',1915,'Tentative alliée contre l’Empire ottoman, échec coûteux.');
+
+
+$('#zoomFrontOuest').addEventListener('click', ()=> map.fitBounds([[51.5, -1.5],[48.5, 6.5]]));
+$('#zoomFrontEst').addEventListener('click', ()=> map.fitBounds([[56, 20],[46, 40]]));
+$('#zoomMonde').addEventListener('click', ()=> map.setView([30, 10], 2));
+
+
+const QUESTIONS = [
+  {q:'La guerre débute en ?', a:['1912','1914','1916'], c:1},
+  {q:'La bataille de Verdun a lieu surtout en :', a:['1914','1916','1918'], c:1},
+  {q:'Quelle arme est utilisée massivement à Ypres ?', a:['Gaz toxiques','Chars','Bombes atomiques'], c:0},
+  {q:'L’entrée en guerre des États‑Unis :', a:['1915','1917','1919'], c:1},
+  {q:'La Somme est surtout :', a:['une offensive alliée de 1916','une bataille navale de 1915','une révolte en Russie'], c:0},
+  {q:'Le front Ouest est caractérisé par :', a:['une guerre de mouvement continue','des tranchées et une guerre d’attrition','une absence de civils'], c:1},
+  {q:'La guerre totale signifie :', a:['seulement l’armée mobilisée','l’économie et la société mobilisées','la fin des impôts'], c:1},
+  {q:'L’armistice du front Ouest :', a:['11 nov. 1918','28 juin 1919','1er août 1914'], c:0},
+  {q:'La Russie se retire progressivement après :', a:['la révolution de 1917','la bataille de la Somme','le traité de Versailles'], c:0},
+  {q:'Verdun est restée célèbre car :', a:['bataille courte et décisive','symbole d’acharnement et pertes énormes','victoire navale britannique'], c:1},
+];
+function renderQCM(){
+  const root = document.getElementById('qcm'); root.innerHTML='';
+  QUESTIONS.forEach((it,idx)=>{
+    const box = document.createElement('div'); box.className='quiz-item';
+    box.innerHTML = '<div><b>Q'+(idx+1)+'.</b> '+it.q+'</div>'
+      + it.a.map((opt,i)=>'<label><input type="radio" name="q'+idx+'" value="'+i+'"> '+opt+'</label>').join('');
+    root.appendChild(box);
+  });
+}
+renderQCM();
+document.getElementById('corriger').addEventListener('click', ()=>{
+  document.querySelectorAll('.quiz-item .correct, .quiz-item .wrong').forEach(e=>e.remove());
+  let score=0;
+  QUESTIONS.forEach((it,idx)=>{
+    const sel = document.querySelector('input[name="q'+idx+'"]:checked');
+    const box = document.querySelectorAll('.quiz-item')[idx];
+    if(!sel){ box.insertAdjacentHTML('beforeend','<div class="wrong">✖ Non répondu</div>'); return; }
+    if(+sel.value===it.c){ score++; box.insertAdjacentHTML('beforeend','<div class="correct">✔ Correct</div>'); }
+    else { box.insertAdjacentHTML('beforeend','<div class="wrong">✖ Faux (bonne réponse : '+it.a[it.c]+')</div>'); }
+  });
+  const s=document.getElementById('scoreQCM'); s.style.display='block'; s.innerHTML='<b>Score :</b> '+score+'/10';
+});
+</script>
+</body>
+</html>
