@@ -93,29 +93,59 @@ button.secondary{background:linear-gradient(180deg,#a68c5a,#8e7a49)}
 <div class="container">
 <div class="grid">
 <main class="paper">
-<h2>1) Frise 1914 → 1918 (clique un point)</h2>
-<div id="timeline"><div class="axis" id="axis"><div class="line"></div></div></div>
-<div class="small">Couleurs : <b>brun</b> = bataille, <b>bleu</b> = politique/diplomatie, <b>rouge</b> = mémoire.</div>
-<div class="hr"></div>
-<h2>2) Carte — Fronts &amp; grandes batailles</h2>
-<div class="mapWrap">
-<div id="leaf"></div>
-<div class="mapToolbar">
-<button class="btn" id="zoomFrontOuest">Front Ouest</button>
-<button class="btn" id="zoomFrontEst">Front Est</button>
-<button class="btn" id="zoomMonde">Monde</button>
-</div>
-<div class="loader" id="loader">Chargement du fond…</div>
-<div class="mapLegend">
-<div class="row"><span class="badge">★</span> Grandes batailles (popup + année)</div>
-</div>
-</div>
-<div class="hr"></div><h2>3) Gazette du Front — 1914‑1918 (feuilletable)</h2><h2>4) QCM — 10 questions</h2><div id="qcm"></div><button class="secondary" id="corriger">Corriger</button><div class="note" id="scoreQCM" style="display:none; background:#fff9f0; border:1px solid var(--line); border-radius:12px; padding:10px; margin-top:8px"></div><div class="hr"></div>
-<div class="small">Feuillette la gazette.</div>
+  <!-- 1) FRISE -->
+  <h2>1) Frise 1914 → 1918 (clique un point)</h2>
+  <div id="timeline"><div class="axis" id="axis"><div class="line"></div></div></div>
+  <div class="small">Couleurs : <b>brun</b> = bataille, <b>bleu</b> = politique/diplomatie, <b>rouge</b> = mémoire.</div>
+  <div class="hr"></div>
+
+  <!-- 2) GAZETTE (déplacée ici, juste après la frise) -->
+  <h2>2) Gazette du Front — 1914-1918 (feuilletable)</h2>
+  <div class="paper" style="background:#fffdf6; padding:0; overflow:hidden">
+    <iframe
+      allow="fullscreen"
+      allowfullscreen
+      loading="lazy"
+      src="Gazette.html"
+      style="width:100%; height:820px; border:0; display:block"
+      title="Gazette du Front 1914-1918">
+    </iframe>
+    <div style="display:flex; gap:8px; align-items:center; justify-content:flex-end; padding:8px 10px; border-top:1px dashed #c9bba4; background:#fffaf0">
+      <a class="btn" href="Gazette.html" target="_blank">🔗 Ouvrir la Gazette dans un onglet</a>
+    </div>
+  </div>
+  <div class="small">Feuillette la gazette.</div>
+  <div class="hr"></div>
+
+  <!-- 3) CARTE -->
+  <h2>3) Carte — Fronts &amp; grandes batailles</h2>
+  <div class="mapWrap">
+    <div id="leaf"></div>
+    <div class="mapToolbar">
+      <button class="btn" id="zoomFrontOuest">Front Ouest</button>
+      <button class="btn" id="zoomFrontEst">Front Est</button>
+      <button class="btn" id="zoomMonde">Monde</button>
+    </div>
+    <div class="loader" id="loader">Chargement du fond…</div>
+    <div class="mapLegend">
+      <div class="row"><span class="badge">★</span> Grandes batailles (popup + année)</div>
+    </div>
+  </div>
+  <div class="hr"></div>
+
+  <!-- 4) QCM -->
+  <h2>4) QCM — 10 questions</h2>
+  <div id="qcm"></div>
+  <button class="secondary" id="corriger">Corriger</button>
+  <div class="note" id="scoreQCM" style="display:none; background:#fff9f0; border:1px solid var(--line); border-radius:12px; padding:10px; margin-top:8px"></div>
+  <div class="hr"></div>
+</main>
 
 
 
-<div></div><div class="paper" style="background:#fffdf6; padding:0; overflow:hidden"><iframe allow="fullscreen" allowfullscreen="" loading="lazy" src="Gazette.html" style="width:100%; height:820px; border:0; display:block" title="Gazette du Front 1914‑1918"></iframe><div style="display:flex; gap:8px; align-items:center; justify-content:flex-end; padding:8px 10px; border-top:1px dashed #c9bba4; background:#fffaf0"><a class="btn" href="Gazette.html" target="_blank">🔗 Ouvrir la Gazette dans un onglet</a></div></div><div class="hr"></div></main>
+
+
+<div class="paper" style="background:#fffdf6; padding:0; overflow:hidden"><iframe allow="fullscreen" allowfullscreen="" loading="lazy" src="Gazette.html" style="width:100%; height:820px; border:0; display:block" title="Gazette du Front 1914‑1918"></iframe><div style="display:flex; gap:8px; align-items:center; justify-content:flex-end; padding:8px 10px; border-top:1px dashed #c9bba4; background:#fffaf0"><a class="btn" href="Gazette.html" target="_blank">🔗 Ouvrir la Gazette dans un onglet</a></div></div><div class="hr"></div></main>
 <aside class="paper">
 <h2>Repères &amp; notions</h2>
 <ul>
