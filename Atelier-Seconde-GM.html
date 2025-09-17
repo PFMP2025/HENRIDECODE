@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Seconde Guerre mondiale — Atelier</title>
+
+<!-- Fonts: stencil + sans -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Stardos+Stencil:wght@700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  /* Palette WWII : kaki/olive/acier + accent or terne */
+  --bg:#0d1012; --bg2:#151a1e;
+  --paper:#f3efe7; --ink:#1b1b1b; --line:#c6bda8;
+  --olive:#556b2f; --khaki:#9aa27b; --steel:#3b4a59; --brick:#9b3b32; --gold:#bfa164;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; color:var(--ink); font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  background:
+    linear-gradient(180deg, var(--bg), var(--bg2)),
+    repeating-linear-gradient(135deg, #101417 0, #101417 12px, #0e1215 12px, #0e1215 24px);
+  overflow-x:hidden;
+}
+
+/* Header */
+header{padding:28px 14px 18px; text-align:center}
+.brand{display:inline-flex; align-items:center; gap:14px; padding:12px 18px; border-radius:18px;
+  background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+  border:1px solid #00000033; box-shadow:0 10px 40px rgba(0,0,0,.35), inset 0 0 0 1px #ffffff14
+}
+.badgeW{width:52px; height:52px; border-radius:12px; border:1px solid #00000066;
+  background:
+    radial-gradient(16px 16px at 28% 30%, #c9b37a 0%, transparent 70%),
+    linear-gradient(135deg, #2a3a42, #3e4b52);
+  box-shadow:inset 0 0 12px #00000055, 0 0 38px #c9b37a44;
+}
+h1{margin:0; font-family:"Stardos Stencil", system-ui, sans-serif; color:#efe6cf; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+  text-shadow:0 2px 0 #00000088, 0 0 28px #00000055;
+}
+.subtitle{color:#e8d9b8cc; margin-top:6px; letter-spacing:.02em}
+
+/* Layout */
+.container{max-width:1200px; margin:0 auto; padding:16px}
+.grid{display:grid; grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr); gap:16px}
+@media (max-width:1024px){.grid{grid-template-columns:1fr}}
+
+/* Cards */
+.paper{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:18px;
+  box-shadow:0 18px 70px rgba(0,0,0,.5), inset 0 0 0 1px #00000010;
+  position:relative;
+}
+/* WWII‑style corner brackets */
+.paper:before,.paper:after{
+  content:""; position:absolute; width:64px; height:64px; border:2px solid var(--gold);
+  top:-10px; border-bottom:none; border-left:none; border-radius:0 14px 0 0; opacity:.5;
+}
+.paper:before{left:-10px; transform:scaleX(-1)}
+.paper:after{right:-10px}
+.hr{border-top:1px dashed var(--line); margin:16px 0}
+
+.btn{
+  appearance:none; border:none; color:#0f1720; cursor:pointer; font-weight:800; letter-spacing:.04em; text-transform:uppercase;
+  background:linear-gradient(180deg,#e6d2a2,#cdb47a);
+  border:1px solid #00000030; border-radius:12px; padding:10px 14px;
+  box-shadow:0 6px 16px rgba(0,0,0,.35), inset 0 0 10px rgba(255,255,255,.08);
+}
+.btn:hover{filter:brightness(1.05)}
+
+.badge{display:inline-flex; gap:6px; align-items:center; padding:6px 10px; border-radius:999px; border:1px solid var(--line); background:#fff7dc; font-weight:700; font-size:12px}
+.kbd{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; padding:.1em .4em; border:1px solid #00000020; border-radius:6px; background:#fff}
+
+/* Sticky aside */
+aside.paper{position:sticky; top:16px; align-self:start}
+
+/* Timeline */
+#timeline{position:relative; background:#fff8ea; border:1px solid var(--line); border-radius:14px; padding:16px; overflow:hidden}
+.axis{position:relative; height:180px}
+.axis .line{
+  position:absolute; top:86px; left:26px; right:26px; height:6px;
+  background:linear-gradient(90deg,#d6c7a4,#b19d6a); border-radius:4px;
+  box-shadow:inset 0 0 8px #00000022;
+}
+.tick{position:absolute; top:62px; width:1px; height:48px; background:#c9b78f}
+.tick label{position:absolute; top:46px; transform:translateX(-50%); font-size:12px; color:#5c4a2c}
+.point{
+  position:absolute; top:70px; width:18px; height:18px; border-radius:50%;
+  border:1px solid #2a2018aa; cursor:pointer; box-shadow:0 2px 6px #00000033;
+  outline:2px solid #0000; transition:transform .15s ease, outline-color .15s ease;
+}
+.point[data-t="mil"]{background:var(--steel)} .point[data-t="pol"]{background:var(--brick)} .point[data-t="sci"]{background:var(--olive)}
+.point:hover{transform:scale(1.12); outline-color:#00000020}
+
+/* Modal */
+.modal{position:fixed; inset:0; background:rgba(12,10,10,.6); display:none; align-items:center; justify-content:center; padding:20px; z-index:1000}
+.modal .card{
+  background:var(--paper); border:1px solid var(--line); border-radius:18px; max-width:900px; width:100%; padding:18px;
+  box-shadow:0 24px 90px rgba(0,0,0,.55)
+}
+.modal h3{margin:0 0 6px 0; font-family:"Stardos Stencil", system-ui, sans-serif; color:#3d3028; letter-spacing:.02em}
+.modal .meta{display:flex; gap:8px; align-items:center; margin-bottom:10px}
+.close{float:right; background:var(--brick); color:#fff; border:none; border-radius:12px; padding:8px 12px; cursor:pointer}
+
+/* Iframe embed (Henri Decode) */
+.embed{background:#fffdf5; border:1px solid var(--line); border-radius:14px; overflow:hidden}
+.embed .top{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:10px; border-bottom:1px dashed var(--line); background:#fff8ea}
+.embed .top .title{font-weight:800; color:#5a492f}
+.embed iframe{display:block; width:100%; height:820px; border:0}
+.embed .bar{display:flex; gap:8px; align-items:center; justify-content:flex-end; padding:8px 10px; border-top:1px dashed var(--line); background:#fffaf0}
+
+/* Quiz */
+.quiz-item{border:1px solid var(--line); border-radius:12px; padding:12px; margin:8px 0; background:#fff9f0}
+.quiz-item label{display:block; margin:6px 0}
+.correct{color:#2e7d32; font-weight:700}
+.wrong{color:#c62828; font-weight:700}
+
+/* Figures */
+figure{margin:0 0 12px 0}
+figure img{width:100%; display:block; border:1px solid var(--line); border-radius:12px; background:#fff}
+figcaption{font-size:12px; color:#6b5a3a; margin-top:6px}
+
+@media (max-width:900px){
+  .axis .line{left:18px; right:18px}
+  .embed iframe{height:76vh}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="badgeW" aria-hidden="true"></div>
+    <div>
+      <h1>Seconde Guerre mondiale (1939‑1945)</h1>
+      <div class="subtitle">Frise • Crypto & renseignement • QCM </div>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="grid">
+    <main class="paper">
+      <section>
+        <h2>1) Objectifs & repères</h2>
+        <p>À l’issue de l’atelier, tu dois savoir : <b>dater</b> les grandes phases (1939, 1941, 1942‑43, 1944‑45), <b>caractériser</b> les fronts (Europe, Pacifique), <b>expliquer</b> la logique industrielle et idéologique du conflit et <b>illustrer</b> les pratiques de chiffrement et de déchiffrement.</p>
+        <div class="badge">Catégories : <b style="color:var(--steel)">militaire</b> • <b style="color:var(--brick)">politique / idéologique</b> • <b style="color:var(--olive)">science & technique</b></div>
+      </section>
+
+      <div class="hr"></div>
+
+      <section>
+        <h2>2) Frise 1939 → 1945 (clique un point)</h2>
+        <div id="timeline"><div class="axis" id="axis"><div class="line"></div></div></div>
+        <div class="hr"></div>
+        <div class="small">Navigation clavier : <span class="kbd">←</span> <span class="kbd">→</span> quand la fenêtre de détail est ouverte.</div>
+      </section>
+
+      <div class="hr"></div>
+
+      <section>
+        <h2>3) Atelier de chiffrement — « HENRI DECODE »</h2>
+        <div class="embed">
+          <div class="top">
+            <div class="title">César, Vigenère, Transposition, Enigma (M3), Playfair, Hill 2×2, One‑Time Pad</div>
+            <button class="btn" onclick="document.getElementById('hdFrame').requestFullscreen?.()">📖 Plein écran</button>
+          </div>
+          <iframe id="hdFrame" src="HENRIDECODE.html" title="HENRI DECODE — atelier de chiffrement"></iframe>
+          <div class="bar">
+            <a class="btn" href="HENRIDECODE.html" target="_blank">🔗 Ouvrir dans un onglet</a>
+          </div>
+        </div>
+      </section>
+
+      <div class="hr"></div>
+
+      <section>
+        <h2>4) QCM — 10 questions</h2>
+        <div id="qcm"></div>
+        <button id="corriger" class="btn">Corriger</button>
+        <span id="scoreQCM" class="badge" style="display:none;margin-left:8px"></span>
+      </section>
+    </main>
+
+    <aside class="paper">
+      <h2>Repères & notions</h2>
+      <ul>
+        <li><b>1939</b> : invasion de la Pologne ; « drôle de guerre » à l’Ouest.</li>
+        <li><b>1940</b> : Blitzkrieg à l’Ouest ; armistice français ; Bataille d’Angleterre.</li>
+        <li><b>1941</b> : Barbarossa ; <b>Pearl Harbor</b> → entrée en guerre des États‑Unis.</li>
+        <li><b>1942‑43</b> : tournants (Midway, Stalingrad, El Alamein).</li>
+        <li><b>1944‑45</b> : débarquement, libérations, capitulations.</li>
+        <li><b>Génocide</b> des Juifs d’Europe (Conférence de Wannsee, 1942).</li>
+        <li><b>Renseignement</b> : Bletchley Park (ULTRA), cassage d’Enigma/Lorenz.</li>
+      </ul>
+
+      <div class="hr"></div>
+
+      <h2>Galerie</h2>
+      <figure>
+        <img src="cartefront.jpg" alt="Carte des fronts " loading="lazy">
+        <figcaption>Fronts européens et pacifiques (remplace par ta carte).</figcaption>
+      </figure>
+      <figure>
+        <img src="propagande.jpg" alt="Affiche de propagande " loading="lazy">
+        <figcaption>Affiche de propagande (années 1940) — remplace par ta ressource.</figcaption>
+      </figure>
+      <figure>
+        <img src="maquis.jpg" alt="Résistance / maquis" loading="lazy">
+        <figcaption>Résistance / maquis (France) — image à remplacer.</figcaption>
+      </figure>
+      
+    </aside>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal" id="modal">
+  <div class="card">
+    <button class="close" id="closeM">Fermer</button>
+    <h3 id="mTitle">Titre</h3>
+    <div class="meta"><span class="badge" id="mYear">1941</span> <span class="badge" id="mType">Militaire</span></div>
+    <div id="mText"></div>
+  </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+
+/* ===== Timeline (reprend et enrichit les événements) ===== */
+const TL = [
+  {year:1939, t:'mil', title:'Invasion de la Pologne', text:'1er sept. : l’Allemagne envahit la Pologne ; 3 sept. : RU et France déclarent la guerre.'},
+  {year:1940, t:'mil', title:'Blitzkrieg à l’Ouest', text:'Mai‑juin : percée par les Ardennes, armistice français (22 juin). Bataille d’Angleterre.'},
+  {year:1941, t:'mil', title:'Barbarossa & Pearl Harbor', text:'22 juin : invasion de l’URSS. 7 déc. : attaque japonaise contre Pearl Harbor → entrée en guerre des USA.'},
+  {year:1942, t:'mil', title:'Tournants', text:'Midway (Pacifique) ; Stalingrad (1942‑43) et El Alamein (Afrique) inversent la dynamique.'},
+  {year:1944, t:'mil', title:'Débarquement & Libérations', text:'6 juin : Débarquement allié en Normandie ; libération de Paris (août). Fronts se resserrent sur l’Allemagne.'},
+  {year:1945, t:'mil', title:'Capitulations', text:'8 mai : capitulation allemande (Europe) ; 6 & 9 août : Hiroshima/Nagasaki ; 2 sept. : capitulation japonaise.'},
+  {year:1942, t:'pol', title:'Génocide des Juifs d’Europe', text:'Conférence de Wannsee (janv. 1942) ; mise en œuvre de la « Solution finale ».'},
+  {year:1943, t:'sci', title:'Cryptanalyse & renseignement', text:'Bletchley Park (ULTRA) : cassage d’Enigma / Lorenz ; communications sécurisées.'}
+];
+let currentIndex = 0;
+function renderAxis(){
+  const axis = document.getElementById('axis'); axis.innerHTML = '<div class="line"></div>';
+  const min=1939, max=1945, span=max-min, w = axis.clientWidth-52;
+  for(let y=min; y<=max; y++){
+    const x = 26 + Math.round(((y-min)/span)*w);
+    const t = document.createElement('div'); t.className='tick'; t.style.left = x+'px';
+    const label = document.createElement('label'); label.textContent = y; t.appendChild(label);
+    axis.appendChild(t);
+  }
+  TL.forEach((ev,idx)=>{
+    const x = 26 + Math.round(((ev.year-min)/span)*w);
+    const p = document.createElement('div'); p.className='point'; p.dataset.t=ev.t; p.style.left = (x-9)+'px';
+    p.title = ev.year+' — '+ev.title;
+    p.addEventListener('click', ()=> { currentIndex=idx; openModal(ev);});
+    axis.appendChild(p);
+  });
+}
+function openModal(ev){
+  const typeMap = {mil:'Militaire', pol:'Politique/idéologique', sci:'Science & technique'};
+  $('#mTitle').textContent = ev.title;
+  $('#mYear').textContent = ev.year;
+  $('#mType').textContent = typeMap[ev.t]||'';
+  $('#mText').innerHTML = '<p>'+ev.text+'</p>';
+  $('#modal').style.display='flex';
+}
+$('#closeM').addEventListener('click', ()=> $('#modal').style.display='none');
+$('#modal').addEventListener('click', (e)=>{ if(e.target.id==='modal') e.currentTarget.style.display='none'; });
+window.addEventListener('resize', renderAxis);
+document.addEventListener('keydown', (e)=>{
+  if(document.getElementById('modal').style.display!=='flex') return;
+  if(e.key==='ArrowRight'){ currentIndex = Math.min(currentIndex+1, TL.length-1); openModal(TL[currentIndex]); }
+  if(e.key==='ArrowLeft'){ currentIndex = Math.max(currentIndex-1, 0); openModal(TL[currentIndex]); }
+});
+renderAxis();
+
+/* ===== QCM ===== */
+const QUESTIONS = [
+  {q:'La guerre en Europe débute par :', a:['l’invasion de la Pologne','le débarquement en Normandie','la bataille d’Angleterre'], c:0},
+  {q:'La « Blitzkrieg » décrit surtout :', a:['une guerre navale','une guerre éclair mécanisée','une guerre de tranchées'], c:1},
+  {q:'Pearl Harbor entraîne :', a:['la sortie des USA du conflit','l’entrée en guerre des USA','la fin de la guerre du Pacifique'], c:1},
+  {q:'Stalingrad (1942‑43) est un tournant car :', a:['victoire allemande','arrêt de l’expansion allemande','paix séparée'], c:1},
+  {q:'Le 6 juin 1944 correspond :', a:['au débarquement en Normandie','à la capitulation allemande','au bombardement d’Hiroshima'], c:0},
+  {q:'La « Solution finale » désigne :', a:['le plan de reconstruction','le génocide des Juifs d’Europe','un accord de paix'], c:1},
+  {q:'ULTRA / Bletchley Park concernent :', a:['la cryptanalyse alliée','les essais atomiques américains','la doctrine de blitzkrieg'], c:0},
+  {q:'Le 8 mai 1945 est :', a:['la capitulation allemande en Europe','la capitulation japonaise','le début de Barbarossa'], c:0},
+  {q:'Dans Enigma, le « Steckerbrett » est :', a:['le tableau de branchement (plugboard)','le réflecteur','un type de rotor'], c:0},
+  {q:'Pour déchiffrer avec Enigma, il faut :', a:['la même clé (rotors, positions, branchements)','inverser la clé','changer de réflecteur'], c:0},
+];
+function renderQCM(){
+  const root = document.getElementById('qcm'); root.innerHTML='';
+  QUESTIONS.forEach((it,idx)=>{
+    const box = document.createElement('div'); box.className='quiz-item';
+    box.innerHTML = '<div><b>Q'+(idx+1)+'.</b> '+it.q+'</div>'
+      + it.a.map((opt,i)=>'<label><input type="radio" name="q'+idx+'" value="'+i+'"> '+opt+'</label>').join('');
+    root.appendChild(box);
+  });
+}
+renderQCM();
+document.getElementById('corriger').addEventListener('click', ()=>{
+  document.querySelectorAll('.quiz-item .correct, .quiz-item .wrong').forEach(e=>e.remove());
+  let score=0;
+  QUESTIONS.forEach((it,idx)=>{
+    const sel = document.querySelector('input[name="q'+idx+'"]:checked');
+    const box = document.querySelectorAll('.quiz-item')[idx];
+    if(!sel){ box.insertAdjacentHTML('beforeend','<div class="wrong">✖ Non répondu</div>'); return; }
+    if(+sel.value===it.c){ score++; box.insertAdjacentHTML('beforeend','<div class="correct">✔ Correct</div>'); }
+    else { box.insertAdjacentHTML('beforeend','<div class="wrong">✖ Faux (bonne réponse : '+it.a[it.c]+')</div>'); }
+  });
+  const s=document.getElementById('scoreQCM'); s.style.display='inline-flex'; s.innerHTML='<b>Score :</b> '+score+'/10';
+});
+</script>
+</body>
+</html>
