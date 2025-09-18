@@ -1,0 +1,65 @@
+[
+  {
+    "id": "colonisation",
+    "titre": "Colonisation",
+    "periode": "XIXe – début XXe",
+    "url": "./Atelier-Colonisation.html",
+    "vignette": "./img/colonisation.jpg",
+    "prop": "globe",
+    "couleur": "#d9c8a1"
+  },
+  {
+    "id": "premieregm",
+    "titre": "Première Guerre mondiale",
+    "periode": "1914 – 1918",
+    "url": "./Atelier-Premiere-GM.html",
+    "vignette": "./img/premiere_gm.jpg",
+    "prop": "banner",
+    "couleur": "#b83e3e"
+  },
+  {
+    "id": "entredeux",
+    "titre": "Entre-deux-guerres",
+    "periode": "1919 – 1939",
+    "url": "./Atelier-EntreDeuxGuerres.html",
+    "vignette": "./img/entre_deux_guerres.jpg",
+    "prop": "radio",
+    "couleur": "#caa77a"
+  },
+  {
+    "id": "secondegm",
+    "titre": "Seconde Guerre mondiale",
+    "periode": "1939 – 1945",
+    "url": "./Atelier-Seconde-GM.html",
+    "vignette": "./img/seconde_gm.jpg",
+    "prop": "banner",
+    "couleur": "#3f3f46"
+  },
+  {
+    "id": "guerrefroide",
+    "titre": "Guerre froide",
+    "periode": "1947 – 1991",
+    "url": "./Atelier-GuerreFroide.html",
+    "vignette": "./img/guerre_froide.jpg",
+    "prop": "rocket",
+    "couleur": "#9fb7ff"
+  },
+  {
+    "id": "eu",
+    "titre": "Construction européenne",
+    "periode": "1951 →",
+    "url": "./Atelier-ConstructionEuropeenne.html",
+    "vignette": "./img/europe.jpg",
+    "prop": "banner",
+    "couleur": "#1e3a8a"
+  },
+  {
+    "id": "multipolaire",
+    "titre": "Monde multipolaire",
+    "periode": "1991 → aujourd'hui",
+    "url": "./Atelier-MondeMultipolaire.html",
+    "vignette": "./img/multipolaire.jpg",
+    "prop": "globe",
+    "couleur": "#2bb3a6"
+  }
+]
