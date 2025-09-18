@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>HENRI DECODE — Dossier 1939‑1945</title>
+
+<!-- Period‑style fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&family=Special+Elite&display=swap" rel="stylesheet">
+
+<style>
+/* =====================
+   Thème "dossier 1939‑1945"
+   (seulement du CSS — aucune logique modifiée)
+   ===================== */
+:root{
+  --paper:#ede7d1;
+  --paper2:#e2d9bd;
+  --ink:#1e1d1a;
+  --muted:#5b574e;
+  --accent:#8b2b2b;     /* tampon rouge foncé */
+  --accent2:#355b3a;    /* vert armée */
+  --edge:#9e9478;
+  --shadow:rgba(0,0,0,.25);
+  --brass:#b08d57;
+  --lamp-off:#2a2a2a;
+  --lamp-on:#f2c063;    /* tungstène/ambre */
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  color:var(--ink);
+  font-family:"Special Elite", "Courier New", Courier, monospace;
+  /* Papier vieilli avec grain */
+  background:
+    radial-gradient(1200px 600px at 30% -10%, rgba(0,0,0,.06), transparent 70%),
+    radial-gradient(800px 500px at 110% 10%, rgba(0,0,0,.05), transparent 70%),
+    linear-gradient(180deg, var(--paper), var(--paper2));
+}
+/* Grain + plis */
+body::before{
+  content:"";
+  position:fixed; inset:0; pointer-events:none;
+  background:
+    repeating-linear-gradient(0deg, rgba(0,0,0,.04), rgba(0,0,0,.04) 1px, transparent 2px, transparent 5px),
+    repeating-linear-gradient(90deg, rgba(0,0,0,.02), rgba(0,0,0,.02) 1px, transparent 3px, transparent 7px);
+  mix-blend-mode:multiply; opacity:.4;
+}
+/* Bords salis */
+body::after{
+  content:"";
+  position:fixed; inset:0; pointer-events:none;
+  background:
+    radial-gradient(900px 600px at -10% 110%, rgba(0,0,0,.15), transparent 60%),
+    radial-gradient(700px 500px at 110% 120%, rgba(0,0,0,.12), transparent 60%);
+  opacity:.25;
+}
+
+header{padding:28px 16px 16px;text-align:center}
+header .brand{
+  display:inline-flex;align-items:center;gap:14px;padding:12px 16px;border-radius:16px;
+  background:linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,.2));
+  border:2px solid var(--edge);
+  box-shadow:0 8px 18px var(--shadow), inset 0 0 0 1px rgba(255,255,255,.4);
+}
+/* Cachet "tampon" stylisé */
+.logo{
+  width:46px;height:46px;border-radius:50%;
+  background:
+    radial-gradient(18px 18px at 35% 35%, rgba(255,255,255,.35), transparent 70%),
+    repeating-radial-gradient(circle at 50% 50%, transparent 0 6px, rgba(0,0,0,.06) 6px 7px),
+    var(--accent);
+  position:relative; box-shadow:0 4px 0 rgba(0,0,0,.15) inset, 0 0 0 4px rgba(139,43,43,.35);
+  border:3px solid rgba(90,20,20,.35);
+}
+.logo::after{
+  content:"RF"; font-family:"IM Fell English SC", serif; font-size:18px; color:#fff;
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  text-shadow:0 1px 0 rgba(0,0,0,.4);
+}
+h1{
+  margin:0;
+  font-family:"IM Fell English SC", serif;
+  letter-spacing:.5px;
+  font-size:clamp(22px,4vw,36px);
+}
+.subtitle{
+  margin:.25rem 0 0; color:var(--muted); font-size:14px;
+}
+
+.container{max-width:1200px;margin:0 auto;padding:16px;display:grid;grid-template-columns:1fr 380px;gap:16px}
+@media (max-width:1100px){ .container{ grid-template-columns:1fr; } }
+
+.card{
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.75), rgba(255,255,255,.55)),
+    repeating-linear-gradient(0deg, transparent, transparent 22px, rgba(0,0,0,.02) 23px);
+  border:2px solid var(--edge);
+  border-radius:14px;
+  box-shadow:0 14px 30px var(--shadow);
+  position:relative;
+}
+.card::after{
+  /* petites oreilles kraft type classeur */
+  content:""; position:absolute; width:46px; height:20px; right:18px; top:-10px;
+  background:linear-gradient(180deg,#c8b990,#b9aa86);
+  border:2px solid #9e8f6c; border-bottom:none; border-radius:8px 8px 0 0;
+  box-shadow:0 6px 0 rgba(0,0,0,.08);
+}
+.card h2{
+  margin:0; padding:12px 14px; font-size:16px; color:#3a372f;
+  border-bottom:2px dashed var(--edge);
+  background:linear-gradient(180deg, rgba(0,0,0,.03), transparent);
+  letter-spacing:.5px;
+}
+.card .content{padding:14px}
+
+/* Libellés / champs */
+label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px}
+input[type=text],textarea,select{
+  width:100%;
+  background:linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.7));
+  color:var(--ink);
+  border:2px solid var(--edge);
+  border-radius:10px;
+  padding:10px 12px; outline:none;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.05);
+}
+textarea{min-height:120px;resize:vertical}
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+
+/* Boutons façon étiquette / métal bruni */
+button{
+  appearance:none; border:none; cursor:pointer;
+  background:linear-gradient(180deg,#d1c6a2,#c0b28d);
+  color:#2b2924; border:2px solid var(--edge);
+  padding:10px 14px; border-radius:12px;
+  transition: transform .05s ease, box-shadow .2s ease;
+  box-shadow:0 6px 12px var(--shadow), inset 0 0 0 1px rgba(255,255,255,.35);
+  font-weight:700; letter-spacing:.3px;
+}
+button:hover{ box-shadow:0 8px 16px var(--shadow), inset 0 0 0 1px rgba(255,255,255,.6); }
+button:active{ transform: translateY(1px) scale(.995); }
+button.primary{
+  background:
+    linear-gradient(180deg,#b19b72,#a18b63);
+  border-color:#8d7d5b;
+  box-shadow:0 6px 14px var(--shadow), inset 0 0 0 1px rgba(255,255,255,.25);
+}
+
+/* GRID */
+.row{display:grid;grid-template-columns:repeat(12,1fr);gap:8px}
+.col-12{grid-column:span 12}.col-6{grid-column:span 6}.col-4{grid-column:span 4}.col-8{grid-column:span 8}
+@media (max-width:720px){.col-6,.col-4,.col-8{grid-column:span 12}}
+
+/* TABS → languettes de dossier */
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.tab{
+  padding:8px 10px;border-radius:10px;border:2px solid var(--edge);cursor:pointer;
+  color:#3a372f;
+  background:linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.6));
+  transition:all .2s ease; font-weight:700;
+}
+.tab:hover{ box-shadow: 0 0 0 3px rgba(139,43,43,.15); border-color: var(--edge); }
+.tab.active{
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.75)),
+    repeating-linear-gradient(0deg, transparent, transparent 18px, rgba(0,0,0,.02) 19px);
+  color:#1f1d19;
+  box-shadow: 0 0 0 3px rgba(53,91,58,.18);
+}
+
+/* LAMPBOARD (tableau lumineux bakélite) */
+.lampboard{
+  display:grid; grid-template-columns: repeat(13, minmax(0,1fr)); gap:8px;
+  padding:10px; border-radius:12px; border:2px solid var(--edge);
+  background:linear-gradient(180deg, rgba(255,255,255,.75), rgba(255,255,255,.6));
+  margin-top:10px;
+  box-shadow: inset 0 2px 0 rgba(255,255,255,.6);
+}
+.lamp{
+  position:relative; height:30px; border-radius:10px;
+  background: radial-gradient(22px 16px at 50% 35%, rgba(255,255,255,.08), rgba(255,255,255,0) 70%), var(--lamp-off);
+  border:2px solid #161616;
+  box-shadow: inset 0 -6px 12px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.06);
+  display:flex; align-items:center; justify-content:center;
+  color:#d7d2c6; font-weight:800; letter-spacing:.8px;
+  text-shadow: 0 1px 0 rgba(0,0,0,.7); user-select:none;
+  font-family:"IM Fell English SC", serif;
+}
+.lamp.on{
+  color:#2b1e0c;
+  background:
+    radial-gradient(30px 18px at 50% 30%, rgba(255,255,255,.65), rgba(255,255,255,0) 70%),
+    radial-gradient(40px 24px at 50% 60%, rgba(0,0,0,.15), rgba(255,255,255,0) 70%),
+    var(--lamp-on);
+  box-shadow:
+    0 0 14px rgba(242,192,99,.65),
+    0 0 36px rgba(242,192,99,.35),
+    inset 0 -6px 10px rgba(0,0,0,.3),
+    inset 0 1px 0 rgba(255,255,255,.3);
+  border-color:#6e5531;
+  animation: pulse 320ms ease;
+}
+@keyframes pulse{ 0%{transform:scale(.98)} 60%{transform:scale(1.01)} 100%{transform:scale(1)} }
+
+.kbd{
+  background:#ece3c5;border:2px solid var(--edge);border-radius:6px;padding:2px 6px;font-size:12px;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.05);
+}
+.small{font-size:12px;color:var(--muted)}
+.hr{border-top:2px dashed var(--edge);margin:10px 0}
+.note{font-size:12px;color:var(--muted)}
+footer{padding:14px;text-align:center;color:var(--muted)}
+
+/* Select : contraste élevé multi‑navigateurs */
+select{
+  background:#fff !important;
+  color:var(--ink) !important;
+  border-color: var(--edge);
+  font-weight:700;
+}
+select:focus{
+  outline:none;
+  border-color: var(--accent2);
+  box-shadow: 0 0 0 3px rgba(53,91,58,.25);
+}
+select option{
+  background:#fff;
+  color:var(--ink);
+}
+@supports (color-scheme: light){
+  select, select option{ color-scheme: light; }
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="logo" aria-hidden="true"></div>
+    <div>
+      <h1>HENRI DECODE</h1>
+      <div class="subtitle">Atelier de chiffrement</div>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+  <section class="card">
+    <h2>Atelier de chiffrement</h2>
+    <div class="content">
+      <div class="tabs" id="tabs"></div>
+      <div id="panel"></div>
+    </div>
+  </section>
+
+  <aside class="card">
+    <h2>Sources & Lettres historiques</h2>
+    <div class="content">
+      <label>Choisir un texte</label>
+      <select id="letterSel"><option value="" disabled selected>— Choisir un texte —</option></select>
+      <div class="hr"></div>
+      <label>Texte (extrait)</label>
+      <textarea id="letterText" readonly></textarea>
+      <div class="controls">
+        <button id="useLetter" title="Envoyer le texte dans l'atelier">Utiliser dans l'atelier</button>
+      </div>
+      <p class="small">Paraphrases et reconstitutions pédagogiques inspirées de sources publiques.</p>
+      <div class="hr"></div>
+      <div class="small">Astuce : <span class="kbd">Ctrl</span>+<span class="kbd">A</span>, puis <span class="kbd">Ctrl</span>+<span class="kbd">C</span>.</div>
+    </div>
+  </aside>
+</div>
+
+<footer>
+  Moteurs inclus : César, Vigenère, Transposition, Enigma (M3), Playfair, Hill (2×2), One‑Time Pad.
+</footer>
+
+
+<script>
+const LETTERS = [
+  {id:'a1', title:'Lucie Aubrac – appel à l’unité ', text:`NOUS NOUS CONNAISSONS PAR LES ACTES ET NON PAR LES TITRES. CHACUN, A SA PLACE, DOIT GARDER LE SANG-FROID ET L'INITIATIVE. NE LAISSONS PERSONNE ISOLÉ : REPEREZ CEUX QUI HÉSITENT, RASSUREZ-LES, DONNEZ LEUR UN RÔLE SIMPLE. NOS LIAISONS DOIVENT RESTER DISCRÈTES, LES MESSAGES COURTS, LES RENDEZ-VOUS BREFS. NOUS RÉUSSIRONS PAR LA TENACITÉ ET LA SOLIDARITÉ.`},
+  {id:'a2', title:'Germaine Tillion – consignes de sécurité ', text:`NE CONSERVEZ AUCUNE LISTE NOMINATIVE. LES NOMS PASSENT PAR DES CLEFS SIMPLES QUE VOUS CHANGEREZ SOUVENT. ÉVITEZ TOUTE HABITUDE D'HORAIRE OU DE LIEU. SI L'UN DE NOUS TOMBE, LES AUTRES NE DOIVENT PAS ÊTRE ENTRAINÉS. C'EST LA DISCIPLINE DES PETITES CELLULES QUI NOUS PROTÈGE.`},
+  {id:'a3', title:'Geneviève de Gaulle-Anthonioz – note d’espoir ', text:`DANS LES HEURES LES PLUS SOMBRES, L'ESPOIR N'EST PAS UN LUXE MAIS UNE ARME. NOUS TENONS PAR LA CONFIANCE QUE NOUS FAISONS CIRCULER. CHAQUE GESTE, SI PETIT SOIT-IL, EST UNE PIERRE POSÉE DANS LE MUR QUI NOUS SÉPARE DE LA PEUR.`},
+  {id:'a4', title:'Marie-Madeleine Fourcade – instruction réseau ', text:`MESSAGE POUR LE GROUPE NOE : CHANGEZ LES ITINÉRAIRES ET LES HORAIRES. NE TRANSPORTEZ JAMAIS DEUX COLIS PAR LA MÊME PERSONNE. UTILISEZ UN SIGNAL LUMINEUX COURT À L'ARRIVÉE ; AUCUN NOM, QUE DES SIGLES.`},
+  {id:'h1', title:'Appel du 18 juin – exhortation (paraphrase)', text:`LA DÉFAITE D'UN JOUR NE DOIT PAS FAIRE OUBLIER LES FORCES QUI DEMEURENT. EN FRANCE ET HORS DE FRANCE, DES ALLIÉS EXISTENT, DES MOYENS SUBSISTENT, DES VOLONTÉS S'ÉVEILLENT. OÙ QUE VOUS SOYEZ, REJOIGNEZ CEUX QUI POURSUIVENT LE COMBAT.`},
+  {id:'h2', title:'Messages personnels de la BBC – série ', text:`LE MEUNIER A CHANGE DE MOULIN. LA LUNE EST CLAIRE SUR LA RIVIÈRE. LES AMIS PRENNENT LE TRAIN DU MATIN. PRÉPAREZ LES OUTILS POUR LA NUIT DE MERCREDI. SI LE CHIEN ABOIE DEUX FOIS, ATTENDEZ LE LENDEMAIN.`},
+  {id:'h3', title:'Billet de liaison – consignes précises ', text:`RENDEZ-VOUS COURT AU CAFE BLEU, MERCREDI ENTRE 18H10 ET 18H20. MOT DE PASSE : « LA RUE EST CALME ». RÉPONSE : « PAS ENCORE ». EN CAS D'IMPRÉVU, REPORTER AU LENDEMAIN, MÊME HEURE, MÊME LIEU.`},
+];
+
+const $ = sel => document.querySelector(sel);
+const el = (tag, attrs={}, ...children) => {
+  const n = document.createElement(tag);
+  for(const [k,v] of Object.entries(attrs)){
+    if(k==='class') n.className=v; else if(k==='style') n.style.cssText=v; else if(k.startsWith('on')) n.addEventListener(k.slice(2), v); else n.setAttribute(k,v);
+  }
+  for(const c of children){ n.appendChild(typeof c==='string'? document.createTextNode(c): c); }
+  return n;
+};
+const ABC='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const idx=c=>c.charCodeAt(0)-65, ch=i=>String.fromCharCode((i%26)+65);
+function normalizeAZ(s){ return s.toUpperCase().replace(/[^A-Z]/g,''); }
+
+function createLampboard(){
+  const board = el('div',{class:'lampboard', id:'lampboard'});
+  for(const L of ABC){ board.appendChild(el('div',{class:'lamp','data-letter':L}, L)); }
+  return board;
+}
+function lightLamp(letter, duration=260){
+  const board = $('#lampboard'); if(!board) return;
+  const L = letter ? letter.toUpperCase() : null;
+  if(!L || !/[A-Z]/.test(L)) return;
+  const node = [...board.children].find(n => n.textContent===L);
+  if(!node) return;
+  node.classList.add('on');
+  setTimeout(()=> node.classList.remove('on'), duration);
+}
+function animateThrough(text){
+  const letters = normalizeAZ(text).split('');
+  let i=0;
+  const step=()=>{
+    if(i>=letters.length) return;
+    lightLamp(letters[i]); i++; setTimeout(step, 70);
+  };
+  step();
+}
+
+function caesarShift(text, shift){
+  shift=((shift%26)+26)%26; let out='';
+  for(const ch of text){
+    const c=ch.toUpperCase();
+    if(c>='A'&&c<='Z') out += String.fromCharCode(((c.charCodeAt(0)-65+shift)%26)+65);
+    else out += ch;
+  }
+  return out;
+}
+function vigenere(text, key, decrypt=false){
+  key = (key||'').toUpperCase().replace(/[^A-Z]/g,'');
+  if(!key) return text;
+  let out='', j=0;
+  for(const ch of text){
+    const c=ch.toUpperCase();
+    if(c>='A'&&c<='Z'){
+      const k = key.charCodeAt(j%key.length)-65;
+      const s = decrypt? (26-k):k;
+      out += String.fromCharCode(((c.charCodeAt(0)-65+s)%26)+65);
+      j++;
+    }else out += ch;
+  }
+  return out;
+}
+function colTranspositionEncrypt(plain, key){
+  const order = key.trim().replace(/\s+/g,'').split('').map(d=>parseInt(d,10));
+  if(order.some(isNaN) || order.length===0) return plain;
+  const cols = order.length, rows = Math.ceil(plain.length/cols);
+  const grid = Array.from({length:rows}, ()=>Array(cols).fill('X'));
+  let i=0; for(let r=0;r<rows;r++) for(let c=0;c<cols;c++) grid[r][c] = plain[i++]||'X';
+  let out='';
+  const pairs = order.map((v,i)=>({v,i})).sort((a,b)=>a.v-b.v);
+  for(const {i:c} of pairs) for(let r=0;r<rows;r++) out += grid[r][c];
+  return out;
+}
+function colTranspositionDecrypt(cipher, key){
+  const order = key.trim().replace(/\s+/g,'').split('').map(d=>parseInt(d,10));
+  if(order.some(isNaN) || order.length===0) return cipher;
+  const cols = order.length, rows = Math.ceil(cipher.length/cols);
+  const grid = Array.from({length:rows}, ()=>Array(cols).fill('X'));
+  const pairs = order.map((v,i)=>({v,i})).sort((a,b)=>a.v-b.v);
+  let i=0; for(const {i:c} of pairs) for(let r=0;r<rows;r++) grid[r][c]=cipher[i++]||'X';
+  let out=''; for(let r=0;r<rows;r++) for(let c=0;c<cols;c++) out += grid[r][c];
+  return out;
+}
+const ROTORS = { I:{wiring:'EKMFLGDQVZNTOWYHXUSPAIBRCJ', notch:'Q'}, II:{wiring:'AJDKSIRUXBLHWTMCQGZNPYFVOE', notch:'E'}, III:{wiring:'BDFHJLCPRTXVZNYEIWGAKMUSQO', notch:'V'}, IV:{wiring:'ESOVPZJAYQUIRHXLNFTGKDCMWB', notch:'J'}, V:{wiring:'VZBRGITYUPSDNHLXAWMJQOFECK', notch:'Z'} };
+const REFLECTOR_B = 'YRUHQSLDPXNGOKMIEBFZCWVJAT';
+class Rotor{constructor({wiring,notch},ring=1,pos='A'){this.w=wiring.split('').map(c=>idx(c));this.inv=Array(26).fill(0);this.w.forEach((w,i)=>this.inv[w]=i);this.n=new Set(notch.split('').map(idx));this.r=(ring-1+26)%26;this.p=idx(pos);}atNotch(){return this.n.has(this.p)}step(){this.p=(this.p+1)%26}f(x){const y=this.w[(x+this.p-this.r+26)%26];return(y-this.p+this.r+26)%26}b(x){const y=this.inv[(x+this.p-this.r+26)%26];return(y-this.p+this.r+26)%26}}
+class Plug{constructor(pairs){this.m=Array.from({length:26},(_,i)=>i);(pairs||[]).forEach(([a,b])=>{const A=idx(a),B=idx(b);this.m[A]=B;this.m[B]=A;});}s(x){return this.m[x];}}
+class Refl{constructor(w){this.w=w.split('').map(c=>idx(c));}r(x){return this.w[x];}}
+class Enigma{constructor(L,M,R,ref,pb){this.L=L;this.M=M;this.R=R;this.ref=ref;this.pb=pb||new Plug();}step(){const m=this.M.atNotch(), r=this.R.atNotch(); this.R.step(); if(r) this.M.step(); if(m){this.M.step(); this.L.step();}} encChar(c){if(!/[A-Z]/.test(c))return c; this.step(); let x=idx(c); x=this.pb.s(x); x=this.R.f(x); x=this.M.f(x); x=this.L.f(x); x=this.ref.r(x); x=this.L.b(x); x=this.M.b(x); x=this.R.b(x); x=this.pb.s(x); return ch(x);} encText(t){let o=''; for(const c of t.toUpperCase()) o+=this.encChar(c); return o;}}
+function playfairSquare(key){
+  key = normalizeAZ(key).replace(/J/g,'I');
+  const used=new Set(); let seq='';
+  for(const c of key+ABC){ const k=c==='J'?'I':c; if(/[A-Z]/.test(k) && k!=='J' && !used.has(k)){ used.add(k); seq+=k; } }
+  return seq.match(/.{1,5}/g);
+}
+function playfairPrepare(text){
+  let s = normalizeAZ(text).replace(/J/g,'I'); let out='';
+  for(let i=0;i<s.length;i+=2){
+    let a=s[i], b=s[i+1]||'X';
+    if(a===b){ out+=a+'X'; i--; } else out+=a+b;
+  }
+  if(out.length%2) out+='X';
+  return out;
+}
+function playfairEncrypt(plain,key){
+  const sq=playfairSquare(key); const pos={};
+  for(let r=0;r<5;r++) for(let c=0;c<5;c++) pos[sq[r][c]]=[r,c];
+  const p=playfairPrepare(plain); let out='';
+  for(let i=0;i<p.length;i+=2){
+    const a=p[i], b=p[i+1]; const [ar,ac]=pos[a], [br,bc]=pos[b];
+    if(ar===br){ out+=sq[ar][(ac+1)%5]+sq[br][(bc+1)%5]; }
+    else if(ac===bc){ out+=sq[(ar+1)%5][ac]+sq[(br+1)%5][bc]; }
+    else { out+=sq[ar][bc]+sq[br][ac]; }
+  }
+  return out;
+}
+function playfairDecrypt(cipher,key){
+  const sq=playfairSquare(key); const pos={};
+  for(let r=0;r<5;r++) for(let c=0;c<5;c++) pos[sq[r][c]]=[r,c];
+  let out='';
+  for(let i=0;i<cipher.length;i+=2){
+    const a=cipher[i], b=cipher[i+1]; const [ar,ac]=pos[a], [br,bc]=pos[b];
+    if(ar===br){ out+=sq[ar][(ac+4)%5]+sq[br][(bc+4)%5]; }
+    else if(ac===bc){ out+=sq[(ar+4)%5][ac]+sq[(br+4)%5][bc]; }
+    else { out+=sq[ar][bc]+sq[br][ac]; }
+  }
+  return out;
+}
+function mod(a,m){ return ((a%m)+m)%m; }
+function invMod(a,m){ for(let x=1;x<m;x++) if(mod(a*x,m)===1) return x; return null; }
+function hillKeyFromString(s){
+  s = normalizeAZ(s);
+  if(s.length<4) return null;
+  return [ [idx(s[0]), idx(s[1])], [idx(s[2]), idx(s[3])] ];
+}
+function det2(A){ return mod(A[0][0]*A[1][1]-A[0][1]*A[1][0],26); }
+function inv2(A){ const d=det2(A); const inv=invMod(d,26); if(inv==null) return null; const B=[[A[1][1], -A[0][1]], [-A[1][0], A[0][0]]]; return [[mod(inv*B[0][0],26), mod(inv*B[0][1],26)], [mod(inv*B[1][0],26), mod(inv*B[1][1],26)]]; }
+function hillEncrypt(plain,A){ plain=normalizeAZ(plain); if(plain.length%2) plain+='X'; let out=''; for(let i=0;i<plain.length;i+=2){ const v=[idx(plain[i]), idx(plain[i+1])]; const r=[mod(A[0][0]*v[0]+A[0][1]*v[1],26), mod(A[1][0]*v[0]+A[1][1]*v[1],26)]; out+=ch(r[0])+ch(r[1]); } return out; }
+function hillDecrypt(cipher,A){ const Inv=inv2(A); if(!Inv) return '[Clé non inversible mod 26]'; let out=''; for(let i=0;i<cipher.length;i+=2){ const v=[idx(cipher[i]), idx(cipher[i+1])]; const r=[mod(Inv[0][0]*v[0]+Inv[0][1]*v[1],26), mod(Inv[1][0]*v[0]+Inv[1][1]*v[1],26)]; out+=ch(r[0])+ch(r[1]); } return out; }
+function otpGenerate(len){ let k=''; for(let i=0;i<len;i++) k+=ABC[Math.floor(Math.random()*26)]; return k; }
+function otpApply(text,key){ const t=normalizeAZ(text); const k=normalizeAZ(key); if(k.length<t.length) return '[Clé trop courte]'; let out=''; for(let i=0;i<t.length;i++){ const v=(idx(t[i])+idx(k[i]))%26; out+=ch(v); } return out; }
+function otpRemove(cipher,key){ const c=normalizeAZ(cipher); const k=normalizeAZ(key); if(k.length<c.length) return '[Clé trop courte]'; let out=''; for(let i=0;i<c.length;i++){ const v=mod(idx(c[i])-idx(k[i]),26); out+=ch(v); } return out; }
+
+const TABS = [
+  {id:'caesar', label:'César', make: panelCaesar},
+  {id:'vigenere', label:'Vigenère', make: panelVigenere},
+  {id:'coltrans', label:'Transposition', make: panelTransposition},
+  {id:'enigma', label:'Enigma', make: panelEnigma},
+  {id:'playfair', label:'Playfair', make: panelPlayfair},
+  {id:'hill', label:'Hill 2×2', make: panelHill},
+  {id:'otp', label:'One‑Time Pad', make: panelOTP},
+  {id:'learn', label:'Leçon rapide', make: panelLearn}
+];
+function renderTabs(){
+  const tabsDiv = $('#tabs'); tabsDiv.innerHTML='';
+  TABS.forEach((t,i)=>{
+    const btn = el('div',{class:'tab'+(i===0?' active':''), onclick:()=>activateTab(t.id)}, t.label);
+    btn.dataset.id=t.id; tabsDiv.appendChild(btn);
+  });
+  activateTab(TABS[0].id);
+}
+function activateTab(id){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active', b.dataset.id===id));
+  const tab = TABS.find(t=>t.id===id);
+  const p = $('#panel'); p.innerHTML='';
+  tab.make(p);
+}
+
+function panelCaesar(root){
+  root.appendChild(el('div',{},
+    el('div',{class:'row'},
+      el('div',{class:'col-6'}, el('label',{},'Texte clair'), el('textarea',{id:'c_in'})),
+      el('div',{class:'col-6'}, el('label',{},'Texte chiffré'), el('textarea',{id:'c_out',readonly:true})),
+    ),
+    el('div',{class:'row'},
+      el('div',{class:'col-4'}, el('label',{},'Décalage (0–25)'), el('input',{id:'c_shift',type:'text',value:'3'})),
+      el('div',{class:'col-8'}, el('label',{},'Conseil'), el('div',{class:'note'},'Teste les 26 décalages et observe les mots fréquents.')),
+    ),
+    el('div',{class:'controls'},
+      el('button',{class:'primary',onclick:()=>{ const s=parseInt($('#c_shift').value)||0; const out = caesarShift($('#c_in').value, s); $('#c_out').value = out; animateThrough(out); }},'Chiffrer'),
+      el('button',{onclick:()=>{ const s=parseInt($('#c_shift').value)||0; const out = caesarShift($('#c_out').value, 26-(s%26)); $('#c_in').value = out; animateThrough(out); }},'Déchiffrer')
+    ),
+    createLampboard()
+  ));
+}
+
+function panelVigenere(root){
+  root.appendChild(el('div',{},
+    el('div',{class:'row'},
+      el('div',{class:'col-6'}, el('label',{},'Texte clair'), el('textarea',{id:'v_in'})),
+      el('div',{class:'col-6'}, el('label',{},'Texte chiffré'), el('textarea',{id:'v_out',readonly:true})),
+    ),
+    el('div',{class:'row'},
+      el('div',{class:'col-6'}, el('label',{},'Clé (ex: RESISTANCE)'), el('input',{id:'v_key',type:'text',value:'RESISTANCE'})),
+      el('div',{class:'col-6'}, el('label',{},'Actions'), el('div',{class:'controls'},
+        el('button',{class:'primary',onclick:()=>{ const out=vigenere($('#v_in').value,$('#v_key').value,false); $('#v_out').value=out; animateThrough(out);} },'Chiffrer'),
+        el('button',{onclick:()=>{ const out=vigenere($('#v_out').value,$('#v_key').value,true); $('#v_in').value=out; animateThrough(out);} },'Déchiffrer')
+      ))
+    ),
+    createLampboard()
+  ));
+}
+
+function panelTransposition(root){
+  root.appendChild(el('div',{},
+    el('div',{class:'row'},
+      el('div',{class:'col-6'}, el('label',{},'Texte clair (A–Z uniquement)'), el('textarea',{id:'t_in'})),
+      el('div',{class:'col-6'}, el('label',{},'Texte chiffré'), el('textarea',{id:'t_out',readonly:true})),
+    ),
+    el('div',{class:'row'},
+      el('div',{class:'col-6'}, el('label',{},'Clé numérique (ex: 3 1 4 2)'), el('input',{id:'t_key',type:'text',value:'3 1 4 2'})),
+      el('div',{class:'col-6'}, el('label',{},'Actions'), el('div',{class:'controls'},
+        el('button',{class:'primary',onclick:()=>{ const out=colTranspositionEncrypt(normalizeAZ($('#t_in').value),$('#t_key').value); $('#t_out').value=out; animateThrough(out);} },'Chiffrer'),
+        el('button',{onclick:()=>{ const out=colTranspositionDecrypt($('#t_out').value,$('#t_key').value); $('#t_in').value=out; animateThrough(out);} },'Déchiffrer')
+      ))
+    ),
+    createLampboard()
+  ));
+}
+
+function panelEnigma(root){
+  const rotorSel = ['I','II','III','IV','V'];
+  const buildSelect=(id)=>{ const s=el('select',{id}); rotorSel.forEach(n=>s.appendChild(el('option',{value:n},n))); return s; };
+  const posInput=(id,val)=> el('input',{id,type:'text',value:val,maxlength:'1'});
+  root.appendChild(el('div',{},
+    el('div',{class:'row'},
+      el('div',{class:'col-6'}, el('label',{},'Texte clair'), el('textarea',{id:'e_in'})),
+      el('div',{class:'col-6'}, el('label',{},'Texte chiffré'), el('textarea',{id:'e_out',readonly:true})),
+    ),
+    el('div',{class:'row'},
+      el('div',{class:'col-4'}, el('label',{},'Rotor L'), buildSelect('e_L')),
+      el('div',{class:'col-4'}, el('label',{},'Rotor M'), buildSelect('e_M')),
+      el('div',{class:'col-4'}, el('label',{},'Rotor R'), buildSelect('e_R')),
+      el('div',{class:'col-4'}, el('label',{},'Pos L'), posInput('e_pL','A')),
+      el('div',{class:'col-4'}, el('label',{},'Pos M'), posInput('e_pM','A')),
+      el('div',{class:'col-4'}, el('label',{},'Pos R'), posInput('e_pR','A')),
+      el('div',{class:'col-12'}, el('label',{},'Steckerbrett (ex: AM FI NV)'), el('input',{id:'e_plug',type:'text',placeholder:'AM FI NV'}))
+    ),
+    el('div',{class:'controls'},
+      el('button',{class:'primary',onclick:()=>enigmaRun(true)},'Chiffrer'),
+      el('button',{onclick:()=>enigmaRun(false)},'Déchiffrer'),
+      el('span',{class:'tab'},'Lampes ci‑dessous → lettres allumées')
+    ),
+    createLampboard(),
+    el('div',{class:'hr'}),
+    el('div',{class:'note'},"Modèle M3 (armée), réflecteur B, double‑stepping. Même réglages pour déchiffrer.")
+  ));
+  $('#e_L').value='I'; $('#e_M').value='II'; $('#e_R').value='III';
+  const clampL = v => (v||'A').toUpperCase().replace(/[^A-Z]/.g,'').slice(0,1)||'A';
+  ['e_pL','e_pM','e_pR'].forEach(id=>$('#'+id).addEventListener('input',()=>{ const el=document.getElementById(id); el.value=clampL(el.value); }));
+  function pairsFrom(s){ s=(s||'').toUpperCase().trim(); if(!s) return []; const tokens=s.split(/\s+/); const used=new Set(); const res=[]; for(const t of tokens){ if(!/^[A-Z]{2}$/.test(t)) continue; const a=t[0],b=t[1]; if(a!==b && !used.has(a) && !used.has(b)){ used.add(a); used.add(b); res.push([a,b]); } } return res; }
+  function enigmaRun(enc){
+    const L=new Rotor(ROTORS[$('#e_L').value],1,$('#e_pL').value||'A');
+    const M=new Rotor(ROTORS[$('#e_M').value],1,$('#e_pM').value||'A');
+    const R=new Rotor(ROTORS[$('#e_R').value],1,$('#e_pR').value||'A');
+    const ref=new Refl(REFLECTOR_B);
+    const pb=new Plug(pairsFrom($('#e_plug').value));
+    const mach=new Enigma(L,M,R,ref,pb);
+    const src = enc? $('#e_in').value : $('#e_out').value;
+    const upper = src.toUpperCase();
+    let out='';
+    for(const c of upper){
+      if(/[A-Z]/.test(c)){
+        const r = mach.encChar(c);
+        out += r;
+        lightLamp(r);
+      } else {
+        out += c;
+      }
+    }
+    if(enc) $('#e_out').value=out; else $('#e_in').value=out;
+  }
+}
+
+function panelPlayfair(root){
+  root.appendChild(el('div',{},
+    el('div',{class:'row'},
+      el('div',{class:'col-6'}, el('label',{},'Texte clair'), el('textarea',{id:'p_in'})),
+      el('div',{class:'col-6'}, el('label',{},'Texte chiffré'), el('textarea',{id:'p_out',readonly:true})),
+    ),
+    el('div',{class:'row'},
+      el('div',{class:'col-6'}, el('label',{},'Clé (ex: LIBERTE)'), el('input',{id:'p_key',type:'text',value:'LIBERTE'})),
+      el('div',{class:'col-6'}, el('label',{},'Actions'), el('div',{class:'controls'},
+        el('button',{class:'primary',onclick:()=>{ const out=playfairEncrypt($('#p_in').value,$('#p_key').value); $('#p_out').value=out; animateThrough(out);} },'Chiffrer'),
+        el('button',{onclick:()=>{ const out=playfairDecrypt(normalizeAZ($('#p_out').value),$('#p_key').value); $('#p_in').value=out; animateThrough(out);} },'Déchiffrer')
+      ))
+    ),
+    createLampboard()
+  ));
+}
+
+function panelHill(root){
+  root.appendChild(el('div',{},
+    el('div',{class:'row'},
+      el('div',{class:'col-6'}, el('label',{},'Texte clair (A–Z)'), el('textarea',{id:'h_in'})),
+      el('div',{class:'col-6'}, el('label',{},'Texte chiffré'), el('textarea',{id:'h_out',readonly:true})),
+    ),
+    el('div',{class:'row'},
+      el('div',{class:'col-8'}, el('label',{},'Clé (4 lettres, ex: HILL)'), el('input',{id:'h_key',type:'text',value:'HILL'})),
+      el('div',{class:'col-4'}, el('label',{},'Actions'), el('div',{class:'controls'},
+        el('button',{class:'primary',onclick:()=>{ const K=hillKeyFromString($('#h_key').value); if(!K) return alert('Clé invalide'); const out=hillEncrypt($('#h_in').value,K); $('#h_out').value=out; animateThrough(out);} },'Chiffrer'),
+        el('button',{onclick:()=>{ const K=hillKeyFromString($('#h_key').value); if(!K) return alert('Clé invalide'); const res=hillDecrypt(normalizeAZ($('#h_out').value),K); if(res.startsWith('[')) alert(res); else { $('#h_in').value=res; animateThrough(res);} }},'Déchiffrer')
+      ))
+    ),
+    el('div',{class:'hr'}),
+    el('div',{class:'note'},"Certaines clés 2×2 ne sont pas inversibles modulo 26 — change de clé si besoin."),
+    createLampboard()
+  ));
+}
+
+function panelOTP(root){
+  root.appendChild(el('div',{},
+    el('div',{class:'row'},
+      el('div',{class:'col-6'}, el('label',{},'Texte clair (A–Z)'), el('textarea',{id:'o_in'})),
+      el('div',{class:'col-6'}, el('label',{},'Texte chiffré'), el('textarea',{id:'o_out',readonly:true})),
+    ),
+    el('div',{class:'row'},
+      el('div',{class:'col-8'}, el('label',{},'Clé (même longueur que le texte)'), el('input',{id:'o_key',type:'text',placeholder:'clé aléatoire A–Z'})),
+      el('div',{class:'col-4'}, el('label',{},'Actions'), el('div',{class:'controls'},
+        el('button',{onclick:()=>{ const t=normalizeAZ($('#o_in').value); $('#o_key').value = otpGenerate(t.length); }},'Générer clé'),
+        el('button',{class:'primary',onclick:()=>{ const out=otpApply($('#o_in').value,$('#o_key').value); $('#o_out').value=out; animateThrough(out);} },'Chiffrer'),
+        el('button',{onclick:()=>{ const out=otpRemove($('#o_out').value,$('#o_key').value); $('#o_in').value=out; animateThrough(out);} },'Déchiffrer')
+      ))
+    ),
+    createLampboard()
+  ));
+}
+
+function panelLearn(root){
+  const section = el('div',{},
+    el('p',{},'Pour un Bac Pro CIEL/MELEC/Chaudronnerie :'),
+    el('ul',{},
+      el('li',{},'César → observer la fréquence et casser le code.'),
+      el('li',{},'Vigenère → clé partagée, effet polyalphabétique.'),
+      el('li',{},'Transposition → permutation seule, à combiner.'),
+      el('li',{},'Playfair/Hill → digrammes et algèbre (lien CIEL/MELEC).'),
+      el('li',{},'Enigma → rotors, réflecteur, steckerbrett.'),
+      el('li',{},'OTP → sécurité théorique vs logistique des clés.')
+    ),
+    el('div',{class:'hr'}),
+    el('p',{class:'small'},'Tape un texte, clique “Chiffrer” → les lampes s’allument comme sur un tableau de contrôle.')
+  );
+  root.appendChild(section);
+}
+
+function initLetters(){
+  const sel = $('#letterSel'); sel.innerHTML='';
+  LETTERS.forEach(L=> sel.appendChild(el('option',{value:L.id}, L.title)) );
+  sel.addEventListener('change', ()=>{ const cur=LETTERS.find(x=>x.id===sel.value); $('#letterText').value = cur? cur.text:''; });
+  sel.value = LETTERS[0].id; $('#letterText').value = LETTERS[0].text;
+  $('#useLetter').addEventListener('click', ()=>{
+    const t = $('#letterText').value;
+    if($('#panel').querySelector('#c_in')) $('#c_in').value = t;
+    if($('#panel').querySelector('#v_in')) $('#v_in').value = t;
+    if($('#panel').querySelector('#t_in')) $('#t_in').value = normalizeAZ(t);
+    if($('#panel').querySelector('#e_in')) $('#e_in').value = t;
+    if($('#panel').querySelector('#p_in')) $('#p_in').value = t;
+    if($('#panel').querySelector('#h_in')) $('#h_in').value = normalizeAZ(t);
+    if($('#panel').querySelector('#o_in')) $('#o_in').value = normalizeAZ(t);
+  });
+}
+
+renderTabs();
+initLetters();
+</script>
+</body>
+</html>
