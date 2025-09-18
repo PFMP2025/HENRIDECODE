@@ -1,4 +1,4 @@
-// Musée 3D – version LÉGÈRE : affiches cliquables uniquement, pas d'objets devant.
+// Musée 3D – LÉGER (affiches seules) + Zoom fort + double-clic focus + cadres dorés
 // Assets optionnels à la RACINE : floor_marble.jpg/png ou floor.jpg/png ; wall_plaster.jpg/png ou wall.jpg/png ; env.hdr
 // Compatible Chrome / Edge / Firefox / Safari.
 
@@ -8,7 +8,10 @@ import { RoomEnvironment } from 'https://esm.sh/three@0.160.0/examples/jsm/envir
 import { RectAreaLightUniformsLib } from 'https://esm.sh/three@0.160.0/examples/jsm/lights/RectAreaLightUniformsLib.js';
 import { RGBELoader } from 'https://esm.sh/three@0.160.0/examples/jsm/loaders/RGBELoader.js';
 
-const SHADOWS = false; // passe à true si tu veux remettre des ombres plus tard
+const SHADOWS = false;            // ombres coupées (perf)
+const ZOOM_MIN_DIST = 0.35;       // distance mini au target (zoom molette)
+const ZOOM_FOCUS_DIST = 0.6;      // distance lors du double-clic focus
+const ZOOM_FOCUS_TIME = 0.85;     // durée animation (s)
 
 const canvas = document.getElementById('c');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
@@ -25,7 +28,7 @@ scene.background = new THREE.Color(0x121a2a);
 
 const pmrem = new THREE.PMREMGenerator(renderer);
 
-// ====== utilitaires de chargement d'assets à la RACINE ======
+// ====== utilitaires chargement d'assets à la RACINE ======
 const texLoader = new THREE.TextureLoader();
 function tryLoadTexture(paths, repeat=[1,1]) {
   return new Promise(resolve => {
@@ -59,17 +62,21 @@ async function tryLoadHDR(paths){
   });
 }
 
-// ====== caméra & contrôles ======
-const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 300);
+// ====== caméra & contrôles (zoom fort activé) ======
+const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.05, 300); // near réduit pour gros zoom
 camera.position.set(0, 2.1, 10);
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.target.set(0, 1.9, 0);
-controls.minDistance = 3.0;
+controls.minDistance = ZOOM_MIN_DIST;  // on peut s'approcher très près
 controls.maxDistance = 24.0;
 controls.minPolarAngle = 0.12;
 controls.maxPolarAngle = Math.PI/2 - 0.05;
 controls.enablePan = false;
+controls.enableZoom = true;
+controls.zoomSpeed = 1.2;
+// Zoom vers le curseur si dispo (r155+)—sinon ignoré sans erreur
+if ('zoomToCursor' in controls) controls.zoomToCursor = true;
 
 // ====== fallback textures procédurales ======
 function proceduralTexture({w=1024,h=1024, draw}){
@@ -164,7 +171,7 @@ const wallProc = proceduralTexture({
   }
   scene.add(dir1, dir2);
 
-  // Néons de plafond (pas d’ombres, très léger)
+  // Néons plafond (RectAreaLight)
   RectAreaLightUniformsLib.init();
   function addStrip(x,y,z,rx,ry,rz){
     const l = new THREE.RectAreaLight(0xffffff, 50, 6.0, 0.9);
@@ -212,7 +219,7 @@ const wallProc = proceduralTexture({
     const tex=new THREE.CanvasTexture(c); tex.colorSpace=THREE.SRGBColorSpace; return tex;
   }
 
-  // charge image : essaie chemin du JSON puis à la racine
+  // charge image : essaie chemin du JSON puis racine
   const texLoader2 = new THREE.TextureLoader();
   function loadTextureSmart(url, onOk, onErr){
     if(!url){ onErr?.(); return; }
@@ -226,7 +233,19 @@ const wallProc = proceduralTexture({
     tryLoad(first, ()=> tryLoad(fallback, ()=> onErr?.()));
   }
 
-  const POSTER_MAX_W=2.6, POSTER_MAX_H=1.7, FRAME_THICK=0.008;
+  // Cadre doré PBR
+  function goldMaterial(){
+    return new THREE.MeshPhysicalMaterial({
+      color: 0xC8A64B, // doré
+      metalness: 1.0,
+      roughness: 0.22,
+      envMapIntensity: 1.2,
+      clearcoat: 0.5,
+      clearcoatRoughness: 0.2
+    });
+  }
+
+  const POSTER_MAX_W=2.6, POSTER_MAX_H=1.7, FRAME_THICK=0.02;
   function fitContain(w,h,maxW,maxH){ const r=w/h; let W=maxW,H=W/r; if(H>maxH){ H=maxH; W=H*r; } return {W,H}; }
 
   const interactables = [];
@@ -234,17 +253,19 @@ const wallProc = proceduralTexture({
   async function addPosterAndLabel({titre, periode, vignette, url, couleur}, wallPos, rotY){
     const g = new THREE.Group(); g.position.copy(wallPos); g.rotation.y = rotY||0;
 
+    // Cadre doré (fine boîte)
     const frame = new THREE.Mesh(
-      new THREE.BoxGeometry(POSTER_MAX_W+0.22, POSTER_MAX_H+0.22, FRAME_THICK),
-      new THREE.MeshStandardMaterial({ color:0x2f4057, metalness:0.2, roughness:0.35, envMapIntensity:0.25 })
+      new THREE.BoxGeometry(POSTER_MAX_W+0.24, POSTER_MAX_H+0.24, FRAME_THICK),
+      goldMaterial()
     );
     frame.castShadow = SHADOWS;
 
+    // Image (devant le cadre)
     const poster = new THREE.Mesh(
       new THREE.PlaneGeometry(POSTER_MAX_W, POSTER_MAX_H),
       new THREE.MeshStandardMaterial({ roughness:0.45, metalness:0.05, envMapIntensity:0.2 })
     );
-    poster.position.z = FRAME_THICK/2 + 0.04; // devant
+    poster.position.z = FRAME_THICK/2 + 0.04; // clairement devant
     frame.renderOrder=0; poster.renderOrder=10;
     poster.material.polygonOffset = true; poster.material.polygonOffsetFactor = -1; poster.material.polygonOffsetUnits = 1;
 
@@ -256,16 +277,12 @@ const wallProc = proceduralTexture({
       }, ()=>{ poster.material.map = posterFallbackTexture(titre, periode); res(); });
     });
 
+    // Cartel
     const plate = new THREE.Mesh(new THREE.PlaneGeometry(1.9, 0.4),
       new THREE.MeshBasicMaterial({ map: labelTexture(titre, periode, couleur||'#e5e7eb'), transparent:true }));
     plate.position.set(0, -1.35, FRAME_THICK/2 + 0.045);
 
-    // petit spot (sans ombre) pour l'œuvre
-    const spot = new THREE.SpotLight(0xffffff, 2.0, 7, Math.PI/7, 0.35, 1);
-    spot.position.set(0, 1.6, 0.6); spot.target.position.set(0,0,0.1);
-    spot.castShadow = false; g.add(spot, spot.target);
-
-    g.userData = { url, titre };
+    g.userData = { url, titre, _isPoster:true };
     g.add(frame, poster, plate);
     scene.add(g); interactables.push(g);
     return g;
@@ -289,37 +306,96 @@ const wallProc = proceduralTexture({
     }
   });
 
-  // Interaction (survol + clic)
+  // ====== Interaction (survol, clic, double-clic focus) ======
   const raycaster=new THREE.Raycaster(); const mouse=new THREE.Vector2();
   const tip=document.createElement('div');
   tip.style.cssText='position:fixed;left:0;top:0;transform:translate(-50%,-130%);pointer-events:none;display:none;z-index:10;padding:6px 8px;border-radius:8px;border:1px solid #ffffff33;background:#0f1626cc;color:#fff;font:12px system-ui,Segoe UI,Roboto;white-space:nowrap';
   document.body.appendChild(tip);
 
-  function pick(e, onHit){
+  function pick(clientX, clientY){
     const rect=renderer.domElement.getBoundingClientRect();
-    mouse.x=((e.clientX-rect.left)/rect.width)*2-1;
-    mouse.y=-((e.clientY-rect.top)/rect.height)*2+1;
+    mouse.x=((clientX-rect.left)/rect.width)*2-1;
+    mouse.y=-((clientY-rect.top)/rect.height)*2+1;
     raycaster.setFromCamera(mouse,camera);
     const hits=raycaster.intersectObjects(interactables, true);
     if(!hits.length) return null;
     let g=hits[0].object; while(g && !g.userData?.url) g=g.parent;
-    if(g && onHit) onHit(g); return g;
+    return g;
   }
+
   addEventListener('mousemove', e=>{
-    const g=pick(e, g=>{
+    const g = pick(e.clientX, e.clientY);
+    if(g){
       tip.textContent=g.userData.titre||'Ouvrir';
       tip.style.left=e.clientX+'px'; tip.style.top=e.clientY+'px';
       tip.style.display='block'; document.body.style.cursor='pointer';
-    });
-    if(!g){ tip.style.display='none'; document.body.style.cursor='default'; }
+    } else {
+      tip.style.display='none'; document.body.style.cursor='default';
+    }
   });
-  addEventListener('click', e=>{ pick(e, g=> window.open(g.userData.url,'_blank','noopener')); });
 
-  // Rendu
+  // Clic = ouvrir la page
+  addEventListener('click', e=>{
+    const g = pick(e.clientX, e.clientY);
+    if (g) window.open(g.userData.url,'_blank','noopener');
+  });
+
+  // Double-clic = focus / zoom smooth sur le tableau
+  let zoomAnim = null; // {t0, dur, fromPos, fromTarget, toPos, toTarget}
+  addEventListener('dblclick', e=>{
+    const g = pick(e.clientX, e.clientY);
+    if(!g || !g.userData?._isPoster) return;
+
+    // cible = position monde du groupe (centre du cadre)
+    const target = new THREE.Vector3();
+    g.getWorldPosition(target);
+
+    // direction depuis centre de la salle vers le tableau → on se place "en face"
+    const toCenter = new THREE.Vector3(0, target.y, 0);
+    const dir = target.clone().sub(toCenter).normalize().multiplyScalar(-1); // vers la salle
+    if (dir.lengthSq() < 1e-6) dir.set(0,0,1); // fallback
+
+    const toTarget = target.clone();
+    const toPos    = target.clone().add(dir.multiplyScalar(ZOOM_FOCUS_DIST)).setY(1.85);
+
+    zoomAnim = {
+      t0: performance.now()/1000,
+      dur: ZOOM_FOCUS_TIME,
+      fromPos: camera.position.clone(),
+      fromTarget: controls.target.clone(),
+      toPos, toTarget
+    };
+  });
+
+  // Rendu + animation zoom
   addEventListener('resize', ()=>{
     renderer.setSize(innerWidth,innerHeight);
     camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix();
   });
-  (function loop(){ controls.update(); renderer.render(scene,camera); requestAnimationFrame(loop); })();
+
+  function ease(t){ // easeInOutCubic
+    return t<0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2;
+  }
+
+  (function loop(){
+    const now = performance.now()/1000;
+
+    if (zoomAnim){
+      const u = (now - zoomAnim.t0) / zoomAnim.dur;
+      if (u >= 1){
+        camera.position.copy(zoomAnim.toPos);
+        controls.target.copy(zoomAnim.toTarget);
+        zoomAnim = null;
+      } else {
+        const k = ease(Math.max(0, Math.min(1, u)));
+        camera.position.lerpVectors(zoomAnim.fromPos, zoomAnim.toPos, k);
+        controls.target.lerpVectors(zoomAnim.fromTarget, zoomAnim.toTarget, k);
+      }
+    }
+
+    controls.update();
+    renderer.render(scene, camera);
+    requestAnimationFrame(loop);
+  })();
 
 })();
