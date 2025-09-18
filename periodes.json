@@ -4,8 +4,9 @@
     "titre": "Colonisation",
     "periode": "XIXe – début XXe",
     "url": "./Atelier-Colonisation.html",
-    "vignette": "./img/colonisation2.jpg",
+    "vignette": "./img/colonisation.jpg",
     "prop": "globe",
+    "gltfUrl": "./models/globe.glb",
     "couleur": "#d9c8a1"
   },
   {
@@ -15,6 +16,7 @@
     "url": "./Atelier-Premiere-GM.html",
     "vignette": "./img/premiere_gm.jpg",
     "prop": "banner",
+    "gltfUrl": "./models/medieval_banner.glb",
     "couleur": "#b83e3e"
   },
   {
@@ -24,6 +26,7 @@
     "url": "./Atelier-EntreDeuxGuerres.html",
     "vignette": "./img/entre_deux_guerres.jpg",
     "prop": "radio",
+    "gltfUrl": "./models/radio.glb",
     "couleur": "#caa77a"
   },
   {
@@ -33,6 +36,7 @@
     "url": "./Atelier-Seconde-GM.html",
     "vignette": "./img/seconde_gm.jpg",
     "prop": "banner",
+    "gltfUrl": "./models/flag.glb",
     "couleur": "#3f3f46"
   },
   {
@@ -42,6 +46,7 @@
     "url": "./Atelier-GuerreFroide.html",
     "vignette": "./img/guerre_froide.jpg",
     "prop": "rocket",
+    "gltfUrl": "./models/rocket.glb",
     "couleur": "#9fb7ff"
   },
   {
@@ -51,6 +56,7 @@
     "url": "./Atelier-ConstructionEuropeenne.html",
     "vignette": "./img/europe.jpg",
     "prop": "banner",
+    "gltfUrl": "./models/eu_banner.glb",
     "couleur": "#1e3a8a"
   },
   {
@@ -60,6 +66,7 @@
     "url": "./Atelier-MondeMultipolaire.html",
     "vignette": "./img/multipolaire.jpg",
     "prop": "globe",
+    "gltfUrl": "./models/world_globe.glb",
     "couleur": "#2bb3a6"
   }
 ]
