@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Première — La France et la construction européenne (1945 → aujourd’hui)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Spectral:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f1221; --bg2:#0b0d17;
+  --paper:#f8f9fd; --ink:#151a2e; --line:#d4daf0;
+  --eu:#003399; --star:#ffcc00; --muted:#6a739d;
+  --accent:#2b6cb0; --accent2:#7aa2ff; --ok:#1c7a3c; --err:#b03a2e;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; color:var(--ink);
+  font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,sans-serif;
+  background:
+    radial-gradient(900px 500px at 15% -10%, #25316a55 0%, transparent 60%),
+    radial-gradient(800px 500px at 100% 0%, #6a254055 0%, transparent 60%),
+    linear-gradient(180deg, var(--bg), var(--bg2));
+  overflow-x:hidden;
+}
+header{padding:22px 14px 12px; text-align:center}
+.brand{
+  display:inline-flex; align-items:center; gap:14px; padding:12px 18px; border-radius:18px;
+  background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
+  border:1px solid #00000033; box-shadow:0 10px 40px rgba(0,0,0,.35), inset 0 0 0 1px #ffffff14
+}
+.cartouche{width:44px; height:44px; border-radius:12px; border:1px solid #00000066;
+  background:conic-gradient(from 0deg,#1b2a6b,#6a1b2a,#1b2a6b);
+  box-shadow:0 0 24px #5aa9ff55, inset 0 0 8px #ffffff22}
+h1{margin:0; font-family:Spectral, Georgia, serif; color:#e9efff; font-weight:700; font-size:clamp(22px,4vw,36px)}
+.subtitle{color:#cfd7ffcc; margin-top:4px}
+.container{max-width:1200px; margin:0 auto; padding:16px}
+.grid{display:grid; grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr); gap:16px}
+@media (max-width:1024px){.grid{grid-template-columns:1fr}}
+
+.paper{background:var(--paper); border:1px solid var(--line); border-radius:16px; padding:14px; box-shadow:0 12px 40px rgba(0,0,0,.35), inset 0 0 0 1px #0000000d}
+.paper h2{margin:0 0 8px 0; font-family:Spectral,Georgia,serif; color:#23305c}
+.hr{border-top:1px dashed var(--line); margin:12px 0}
+.small{color:var(--muted); font-size:12px}
+.badge{display:inline-block; padding:2px 8px; border-radius:999px; border:1px solid var(--line); background:#eef3ff; font-weight:700; font-size:12px}
+
+button,.btn{appearance:none;border:none;cursor:pointer;border-radius:12px;padding:10px 14px;color:#fff;
+background:linear-gradient(180deg,#3d5bdb,#2b49c7); border:1px solid #00000055; box-shadow:0 8px 20px rgba(0,0,0,.35), inset 0 0 12px rgba(255,255,255,.08);
+transition: transform .05s ease, box-shadow .2s ease; text-decoration:none; display:inline-block}
+button:hover,.btn:hover{box-shadow:0 12px 26px rgba(0,0,0,.5), 0 0 24px #7aa2ff55}
+button:active,.btn:active{transform:translateY(1px) scale(.995)}
+button.secondary{background:linear-gradient(180deg,#7f8bb9,#6b78a8)}
+button.ghost{background:#ffffff; color:#23305c; border:1px solid var(--line)}
+
+/* GAME blocks */
+.block{border:1px solid var(--line); border-radius:16px; padding:12px; background:#fff}
+.columns{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+@media (max-width:1000px){.columns{grid-template-columns:1fr}}
+.flex{display:flex; gap:8px; align-items:center}
+
+/* Flag game */
+.flagWrap{position:relative; background:var(--eu); border-radius:12px; border:1px solid #001a66; height:280px; box-shadow:inset 0 0 40px rgba(0,0,0,.25)}
+.flag{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%)}
+.star{fill:var(--star); opacity:.15; transition:opacity .25s ease, transform .25s ease}
+.star.on{opacity:1; transform:scale(1.08)}
+.qa{border:1px dashed var(--line); border-radius:12px; padding:10px; background:#f6f8ff}
+.qa .question{font-weight:700; margin-bottom:6px}
+.qa .opts{display:grid; grid-template-columns:1fr; gap:6px}
+.qa .opts button{background:#eef3ff; color:#23305c}
+.flagScore{margin-top:6px}
+
+/* Enlargement game */
+.timeline{border:1px solid var(--line); border-radius:12px; padding:10px; background:#f6f8ff}
+.years{display:flex; flex-wrap:wrap; gap:8px}
+.yearBtn{background:#fff; color:#23305c; border:1px solid var(--line)}
+.yearBtn.correct{background:#d8f5e5; border-color:#a7e3c6}
+.yearBtn.wrong{background:#ffe1de; border-color:#f0b0a8}
+.wave{border:1px solid var(--line); border-radius:12px; padding:10px; background:#fff}
+.wave h4{margin:0 0 6px 0}
+.wave .countries{font-size:12px; color:#374173}
+.prog{margin-top:8px; background:#eef3ff; border:1px solid var(--line); border-radius:10px; overflow:hidden; height:12px}
+.prog .bar{height:100%; width:0%; background:linear-gradient(90deg, #7aa2ff, #2b6cb0); transition:width .4s ease}
+
+/* Institutions game */
+.instGrid{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+@media (max-width:900px){.instGrid{grid-template-columns:1fr}}
+.inst{border:1px solid var(--line); border-radius:12px; padding:10px; background:#fff; display:flex; gap:10px; align-items:center}
+.icon{width:54px; height:54px; border-radius:12px; border:1px solid var(--line); display:flex; align-items:center; justify-content:center; background:#eef3ff; position:relative; overflow:hidden}
+.icon svg{width:36px; height:36px}
+.icon.glow::after{content:''; position:absolute; inset:-6px; border-radius:14px; box-shadow:0 0 30px 8px rgba(122,162,255,.7); pointer-events:none; animation:pulse 1.2s infinite ease-in-out}
+@keyframes pulse{0%{opacity:.6} 50%{opacity:1} 100%{opacity:.6}}
+.role{flex:1}
+.role .q{font-weight:700}
+.role .choices{display:flex; flex-wrap:wrap; gap:8px; margin-top:6px}
+.role .choices button{background:#eef3ff; color:#23305c}
+.feedback{font-size:12px; margin-top:4px}
+.ok{color:var(--ok); font-weight:700}
+.err{color:var(--err); font-weight:700}
+
+/* QCM */
+.quiz-item{border:1px solid var(--line); border-radius:10px; padding:8px; margin:8px 0; background:#fff}
+.quiz-item label{display:block; margin:.2rem 0}
+.correct{color:#1c7a3c; font-weight:700; margin-top:4px}
+.wrong{color:#b03a2e; font-weight:700; margin-top:4px}
+
+.gallery{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+}
+.gallery figure{
+  margin:0;
+  border:1px solid var(--line, #e5e7eb);
+  border-radius:12px;
+  overflow:hidden;
+  background:var(--paper, #fff);
+  box-shadow:0 4px 12px rgba(0,0,0,.08);
+}
+.gallery img{
+  max-width:100%;
+  height:auto;
+  display:block;
+  transition:transform .18s ease;
+}
+.gallery a:hover img{
+  transform:scale(1.02);
+}
+.gallery figcaption{
+  padding:8px 10px 10px;
+  font-size:.9rem;
+  line-height:1.3;
+}
+.gallery figcaption small{
+  display:block;
+  opacity:.7;
+  font-size:.78rem;
+}
+@media (min-width: 1100px){
+  .gallery{
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+
+.gallery img{
+  max-width:100%;
+  height:auto;
+  display:block;
+}
+aside .gallery{
+  max-width:100%;
+}
+
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="cartouche" aria-hidden="true"></div>
+    <div>
+      <h1>La France et la construction européenne (1945 → aujourd’hui)</h1>
+      <div class="subtitle">Des Communautés européennes à l’Union européenne : étapes, institutions, élargissements et débats</div>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="grid">
+    <main class="paper">
+      <h2>Le cours — repères & notions</h2>
+      <div class="small"><b>Repères :</b> 1951 (CECA) • 1957 (Traité de Rome) • 1963/67 (veto français au RU) • 1973 (1er élargissement) • 1986 (Acte unique) • 1992 (Maastricht) • 1999/2002 (Euro) • 2004 (élargissement à l’Est) • 2007 (Lisbonne) • 2016 (Brexit).</div>
+      <ul class="small">
+        <li><b>Origines</b> : réconciliation franco-allemande, CECA (charbon/acier) puis CEE (marché commun).</li>
+        <li><b>Étapes</b> : marché unique (1986), citoyenneté européenne et euro (1992→2002), renforcement institutionnel (Lisbonne).</li>
+        <li><b>Élargissements</b> : 6 → 9 (1973) → 12 (1986) → 15 (1995) → 25 (2004) → 27 (2007) → 28 (2013) → 27 (post‑Brexit).</li>
+        <li><b>Institutions</b> : Commission (initiative, exécution), Parlement (co‑législateur élu), Conseil (États), Conseil européen (orientations), BCE (euro).</li>
+        <li><b>Débats</b> : souveraineté, démocratisation, élargissement vs approfondissement, crises (euro, migrations, Brexit).</li>
+        <li><b>France</b> : moteur historique, parfois ambivalente (veto gaullien ; promotion de la PAC ; rôle dans les traités).</li>
+      </ul>
+
+      <div class="hr"></div>
+
+      
+      <h2>Puzzle du drapeau européen ⭐</h2>
+      <div class="block columns">
+        <div class="flagWrap">
+          <svg class="flag" viewBox="0 0 300 200" width="300" height="200" aria-label="Drapeau européen">
+            
+            <g id="stars"></g>
+          </svg>
+        </div>
+        <div class="qa">
+          <div class="question" id="flagQ">Question…</div>
+          <div class="opts" id="flagOpts"></div>
+          <div class="flagScore small" id="flagScore"></div>
+          <div style="margin-top:8px; display:flex; gap:8px">
+            <button class="btn" id="flagNext">Question suivante</button>
+            <button class="btn secondary" id="flagReset">Réinitialiser</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      
+      <h2>Les élargissements de l’UE (clique dans le bon ordre)</h2>
+      <div class="block">
+        
+        <div class="years" id="yearBtns"></div>
+        <div class="columns" style="margin-top:10px">
+          <div class="wave">
+            <h4 id="waveTitle">Étape 1</h4>
+            <div class="countries" id="waveCountries">Clique la bonne année pour révéler les pays concernés.</div>
+          </div>
+          <div>
+            <div class="prog"><div class="bar" id="enlProg"></div></div>
+            <div class="small" id="enlMsg" style="margin-top:6px"></div>
+            <div style="margin-top:8px; display:flex; gap:8px">
+              <button class="btn" id="enlReset">Réinitialiser</button>
+              <button class="btn secondary" id="enlReveal">Tout révéler</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      
+      <h2>Qui fait quoi ? (institutions de l’UE)</h2>
+      <div class="block instGrid" id="instGrid"></div>
+
+      <div class="hr"></div>
+      <h2>Évaluation rapide (QCM)</h2>
+      <div id="qcm"></div>
+      <button id="corriger" class="secondary">Corriger</button>
+      <div id="scoreQCM" class="paper small" style="display:none; margin-top:8px"></div>
+    </main>
+
+    <aside class="paper">
+      <h2>Rappels express</h2>
+      <ul class="small">
+        <li><b>1951 :</b> CECA (Schuman/Monnet).</li>
+        <li><b>1957 :</b> Traité de Rome (CEE/Euratom).</li>
+        <li><b>1986 :</b> Acte unique → marché unique (1993).</li>
+        <li><b>1992 :</b> Maastricht (UE, citoyenneté, euro).</li>
+        <li><b>2004–2007 :</b> grands élargissements (Est & Sud‑Est).</li>
+        <li><b>2007 :</b> Lisbonne (réformes institutionnelles).</li>
+        <li><b>2016 :</b> Brexit.</li>
+      </ul>
+      <div class="hr"></div>
+      <a class="btn" href="#" onclick="window.history.back(); return false;">⬅ Retour aux ateliers</a>
+    
+
+<div class="hr"></div>
+<h2>Galerie visuelle</h2>
+<div class="gallery">
+  <figure>
+    <img src="feracier.jpg" alt="Charbon et acier, symboles de la CECA">
+    <figcaption>1951 : CECA (charbon et acier, réconciliation franco-allemande)</figcaption>
+  </figure>
+
+  <figure>
+    <img src="traiterderome.jpg" alt="Signature du Traité de Rome en 1957">
+    <figcaption>1957 : Traité de Rome, naissance de la CEE</figcaption>
+  </figure>
+
+  <figure>
+    <img src="parlement-europeen-strasbourg.jpg" alt="Parlement européen à Strasbourg">
+    <figcaption>1979 : Parlement européen élu au suffrage universel (Strasbourg)</figcaption>
+  </figure>
+
+  <figure>
+    <img src="euro.jpg" alt="Billets et pièces en euros">
+    <figcaption>2002 : entrée en circulation de l’euro</figcaption>
+  </figure>
+
+  <figure>
+    <img src="EU25-2004_European_Union_map_enlargement.svg.png" alt="Carte de l’élargissement de 2004">
+    <figcaption>2004 : élargissement majeur à l’Est (10 nouveaux États)</figcaption>
+  </figure>
+
+  <figure>
+    <img src="Definition-Brexit-F.jpg" alt="Brexit, drapeau britannique et européen">
+    <figcaption>2016 : Brexit (référendum au Royaume-Uni)</figcaption>
+  </figure>
+
+  <figure>
+    <img src="European_Commission_in_Brussels.jpg" alt="Siège de la Commission européenne à Bruxelles">
+    <figcaption>Commission européenne, Bruxelles</figcaption>
+  </figure>
+</div>
+
+</div>
+
+<script>
+
+const starContainer = document.getElementById('stars');
+
+(function drawStars(){
+  const cx=150, cy=100, r=60, n=12;
+  for(let i=0;i<n;i++){
+    const a = (i/n)*Math.PI*2 - Math.PI/2;
+    const x = cx + r*Math.cos(a);
+    const y = cy + r*Math.sin(a);
+    const star = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+    star.setAttribute('points', starPoints(x,y,10,4,5));
+    star.setAttribute('class','star'); 
+    starContainer.appendChild(star);
+  }
+})();
+function starPoints(cx,cy,outer,inner,spikes){
+  let rot=Math.PI/2*3, x=cx, y=cy, step=Math.PI/spikes, path='';
+  for(let i=0;i<spikes;i++){
+    x=cx+Math.cos(rot)*outer; y=cy+Math.sin(rot)*outer; path+=`${x},${y} `; rot+=step;
+    x=cx+Math.cos(rot)*inner; y=cy+Math.sin(rot)*inner; path+=`${x},${y} `; rot+=step;
+  }
+  return path;
+}
+
+const FLAG_QA = [
+  {q:"Quel traité fonde la CEE (marché commun) ?", opts:["Traité de Rome (1957)","Traité de Maastricht (1992)","Traité de Lisbonne (2007)"], c:0},
+  {q:"En quelle année la France et l’Allemagne lancent la CECA ?", opts:["1949","1951","1955"], c:1},
+  {q:"Quel pays quitte l’UE après référendum ?", opts:["Royaume-Uni","Danemark","Irlande"], c:0},
+  {q:"La monnaie unique s’appelle :", opts:["L’écu","L’euro","Le ducat"], c:1},
+  {q:"Quel duo est à l’origine de la méthode communautaire ?", opts:["Monnet & Schuman","De Gaulle & Adenauer","Mitterrand & Kohl"], c:0},
+  {q:"Quel acte prépare le marché unique ?", opts:["Acte unique (1986)","Amsterdam (1997)","Nice (2001)"], c:0},
+  {q:"Quel est le rôle principal de la Commission ?", opts:["Représenter les États","Initier les lois & exécuter","Rendre la justice"], c:1},
+  {q:"Quel organe est élu au suffrage universel direct ?", opts:["Parlement européen","Conseil de l’UE","Commission"], c:0},
+  {q:"Que signifie BCE ?", opts:["Banque centrale européenne","Bourse commune européenne","Base commune économique"], c:0},
+  {q:"Quel traité crée l’Union européenne ?", opts:["Rome","Maastricht","Lisbonne"], c:1},
+  {q:"La PAC vise surtout :", opts:["Politique agricole commune","Police administrative centrale","Pacte aérien communautaire"], c:0},
+  {q:"Combien d’étoiles sur le drapeau européen ?", opts:["10","12","27"], c:1}
+];
+
+let flagIdx=0, flagScore=0;
+const flagQ = document.getElementById('flagQ');
+const flagOpts = document.getElementById('flagOpts');
+const flagScoreEl = document.getElementById('flagScore');
+const flagNext = document.getElementById('flagNext');
+const flagReset = document.getElementById('flagReset');
+
+function renderFlagQ(){
+  const it = FLAG_QA[flagIdx];
+  flagQ.textContent = `Q${flagIdx+1}. ${it.q}`;
+  flagOpts.innerHTML='';
+  it.opts.forEach((o,i)=>{
+    const b = document.createElement('button'); b.className='btn ghost'; b.textContent=o;
+    b.addEventListener('click', ()=>{
+      [...flagOpts.children].forEach(x=>x.disabled=true);
+      if(i===it.c){ flagScore++; lightStar(flagScore-1); b.style.background='#d8f5e5'; }
+      else{ b.style.background='#ffe1de'; flagOpts.children[it.c].style.background='#d8f5e5'; }
+      updateFlagScore();
+    });
+    flagOpts.appendChild(b);
+  });
+  updateFlagScore();
+}
+function lightStar(n){ const s = starContainer.children[n]; if(s){ s.classList.add('on'); } }
+function clearStars(){ [...starContainer.children].forEach(s=> s.classList.remove('on')); }
+function updateFlagScore(){
+  flagScoreEl.textContent = `Étoiles allumées : ${flagScore}/12`;
+}
+flagNext.addEventListener('click', ()=>{
+  if(flagIdx < FLAG_QA.length-1){ flagIdx++; renderFlagQ(); }
+});
+flagReset.addEventListener('click', ()=>{ flagIdx=0; flagScore=0; clearStars(); renderFlagQ(); });
+renderFlagQ();
+
+
+const WAVES = [
+  {year:1986, question:"Trouve l’année de l’entrée de l’Espagne et du Portugal", countries:"+ Espagne, Portugal."},
+  {year:1995, question:"Trouve l’année de l’entrée de l’Autriche, de la Finlande et de la Suède", countries:"+ Autriche, Finlande, Suède."},
+  {year:2007, question:"Trouve l’année de l’entrée de la Bulgarie et de la Roumanie", countries:"+ Roumanie, Bulgarie."},
+  {year:2013, question:"Trouve l’année de l’entrée de la Croatie", countries:"+ Croatie."},
+  {year:1981, question:"Trouve l’année de l’entrée de la Grèce", countries:"+ Grèce."},
+  {year:2004, question:"Trouve l’année du grand élargissement à l’Est (10 pays)", countries:"+ Pologne, Tchéquie, Slovaquie, Hongrie, Slovénie, Estonie, Lettonie, Lituanie, Malte, Chypre."},
+  {year:1957, question:"Trouve l’année du Traité de Rome (CEE)", countries:"États fondateurs (6) : France, RFA/Allemagne, Italie, Belgique, Pays‑Bas, Luxembourg."},
+  {year:1973, question:"Trouve l’année de l’entrée du Royaume-Uni, de l’Irlande et du Danemark", countries:"+ Royaume‑Uni, Irlande, Danemark."}
+];
+const ORDER = WAVES.map(w=>w.year);
+const yearBtns = document.getElementById('yearBtns');
+const waveTitle = document.getElementById('waveTitle');
+const waveCountries = document.getElementById('waveCountries');
+const enlProg = document.getElementById('enlProg');
+const enlMsg = document.getElementById('enlMsg');
+const enlReset = document.getElementById('enlReset');
+const enlReveal = document.getElementById('enlReveal');
+
+let step=0;
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function renderYears(){
+  yearBtns.innerHTML='';
+  shuffle([...ORDER]).forEach(y=>{
+    const b = document.createElement('button'); b.className='btn yearBtn'; b.textContent=y;
+    b.addEventListener('click', ()=> pickYear(y,b));
+    yearBtns.appendChild(b);
+  });
+  updateWaveUI();
+}
+function pickYear(y,btn){
+  const expected = ORDER[step];
+  if(y===expected){
+    btn.classList.add('correct'); btn.disabled=true;
+    waveCountries.textContent = WAVES[step].countries;
+    step++; enlProg.style.width = (step/ORDER.length*100)+'%';
+    enlMsg.textContent = step===ORDER.length ? "Bravo ! Tu as reconstitué la chronologie des élargissements." : "Correct. Trouve l’étape suivante.";
+    updateWaveUI();
+  }else{
+    btn.classList.add('wrong'); setTimeout(()=> btn.classList.remove('wrong'), 400);
+    enlMsg.textContent = "Non : ce n’est pas la bonne année pour cette étape.";
+  }
+}
+function updateWaveUI(){
+  waveTitle.textContent = step<ORDER.length ? `Étape ${step+1} — ${WAVES[step].question}` : "Terminé";
+  
+if(step===ORDER.length){
+  let recap = "<h3>Récapitulatif des élargissements :</h3><ul>" +
+    WAVES.sort((a,b)=>a.year-b.year).map(w=>`<li>${w.year} — ${w.countries}</li>`).join("") +
+    "</ul>";
+  waveCountries.innerHTML = recap;
+}
+
+}
+function resetEnl(){ step=0; enlProg.style.width='0%'; enlMsg.textContent=''; renderYears(); }
+function revealAll(){ ORDER.forEach((y,i)=>{
+  const btn = [...yearBtns.children].find(b=>+b.textContent===y);
+  if(btn){ pickYear(y,btn); }
+}); }
+enlReset.addEventListener('click', resetEnl);
+enlReveal.addEventListener('click', revealAll);
+resetEnl();
+
+
+const INSTITS = [
+  {id:'parl', name:'Parlement européen', icon:'M6 28h36v8H6z M10 18h28v8H10z M14 8h20v8H14z', role:'Institution élue qui participe à la loi et contrôle la Commission.', correct:'Parlement européen'},
+  {id:'comm', name:'Commission européenne', icon:'M8 10h28v20H8z M12 6h20v6H12z M12 30h20v6H12z', role:'Propose les lois et veille à leur application (gardienne des traités).', correct:'Commission européenne'},
+  {id:'cons', name:'Conseil de l’UE', icon:'M10 10h28v6H10z M10 18h28v6H10z M10 26h28v6H10z', role:'Réunit les ministres des États ; adopte les lois avec le Parlement.', correct:'Conseil de l’UE'},
+  {id:'bce',  name:'BCE', icon:'M24 8a12 12 0 1 1 0 24a12 12 0 1 1 0-24 M22 12h4v16h-4z M18 20h16v4H18z', role:'Gère l’euro et la politique monétaire de la zone euro.', correct:'BCE'}
+];
+const CHOICES = ['Parlement européen','Commission européenne','Conseil de l’UE','BCE'];
+
+const instGrid = document.getElementById('instGrid');
+function renderInst(){
+  instGrid.innerHTML='';
+  INSTITS.forEach(inst=>{
+    const box = document.createElement('div'); box.className='inst';
+    const icon = document.createElementNS('http://www.w3.org/2000/svg','svg'); icon.setAttribute('viewBox','0 0 48 48');
+    const p = document.createElementNS('http://www.w3.org/2000/svg','path'); p.setAttribute('d', inst.icon); p.setAttribute('fill','#2b6cb0');
+    icon.appendChild(p);
+    const iconWrap = document.createElement('div'); iconWrap.className='icon'; iconWrap.appendChild(icon);
+    const role = document.createElement('div'); role.className='role';
+    role.innerHTML = `<div class="q">${inst.role}</div>`;
+    const choices = document.createElement('div'); choices.className='choices';
+    CHOICES.forEach(ch=>{
+      const b = document.createElement('button'); b.className='btn ghost'; b.textContent=ch;
+      b.addEventListener('click', ()=>{
+        [...choices.children].forEach(x=>x.disabled=true);
+        const fb = document.createElement('div'); fb.className='feedback';
+        if(ch===inst.correct){ fb.innerHTML = '<span class="ok">✔ Correct</span>'; iconWrap.classList.add('glow'); }
+        else{ fb.innerHTML = `<span class="err">✖ Faux</span> (bonne réponse : <b>${inst.correct}</b>)`; }
+        role.appendChild(fb);
+      });
+      choices.appendChild(b);
+    });
+    role.appendChild(choices);
+    box.appendChild(iconWrap); box.appendChild(role);
+    instGrid.appendChild(box);
+  });
+}
+renderInst();
+
+
+const QUESTIONS = [
+  {q:'Quel traité crée l’Union européenne ?', a:['Rome (1957)','Maastricht (1992)','Lisbonne (2007)'], c:1},
+  {q:'Quel acte prépare l’achèvement du marché unique ?', a:['Acte unique (1986)','Nice (2001)','Amsterdam (1997)'], c:0},
+  {q:'Le Parlement européen est :', a:['Nommé par les gouvernements','Élu au suffrage universel direct','Composé de juges'], c:1},
+  {q:'La Commission européenne :', a:['Représente les États','Propose les lois et veille à leur application','Rend la justice'], c:1},
+  {q:'La BCE gère principalement :', a:['La politique agricole','La politique monétaire de la zone euro','La politique extérieure'], c:1},
+  {q:'En 2004, combien de pays entrent dans l’UE ?', a:['3','10','12'], c:1},
+  {q:'Le Brexit concerne :', a:['Le Danemark','Le Royaume‑Uni','La Norvège'], c:1},
+  {q:'La France oppose un veto à l’entrée du RU dans les années :', a:['1950','1960','1980'], c:1},
+  {q:'La politique agricole commune (PAC) naît dans les années :', a:['1950','1960','1970'], c:1},
+  {q:'Le Traité de Lisbonne entre en vigueur en :', a:['2005','2009','2012'], c:1}
+];
+function renderQCM(){
+  const root = document.getElementById('qcm'); root.innerHTML='';
+  QUESTIONS.forEach((it,idx)=>{
+    const box = document.createElement('div'); box.className='quiz-item';
+    box.innerHTML = '<div><b>Q'+(idx+1)+'.</b> '+it.q+'</div>'
+      + it.a.map((opt,i)=>'<label><input type="radio" name="q'+idx+'" value="'+i+'"> '+opt+'</label>').join('');
+    root.appendChild(box);
+  });
+}
+renderQCM();
+document.getElementById('corriger').addEventListener('click', ()=>{
+  document.querySelectorAll('.quiz-item .correct, .quiz-item .wrong').forEach(e=>e.remove());
+  let score=0;
+  QUESTIONS.forEach((it,idx)=>{
+    const sel = document.querySelector('input[name="q'+idx+'"]:checked');
+    const box = document.querySelectorAll('.quiz-item')[idx];
+    if(!sel){ box.insertAdjacentHTML('beforeend','<div class="wrong">✖ Non répondu</div>'); return; }
+    if(+sel.value===it.c){ score++; box.insertAdjacentHTML('beforeend','<div class="correct">✔ Correct</div>'); }
+    else { box.insertAdjacentHTML('beforeend','<div class="wrong">✖ Faux (bonne réponse : '+it.a[it.c]+')</div>'); }
+  });
+  const s=document.getElementById('scoreQCM'); s.style.display='block'; s.innerHTML='<b>Score :</b> '+score+'/10';
+});
+</script>
+</body>
+</html>
