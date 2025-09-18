@@ -5,8 +5,6 @@
     "periode": "XIXe – début XXe",
     "url": "./Atelier-Colonisation.html",
     "vignette": "./colonisation2.jpg",
-    "prop": "globe",
-    "gltfUrl": "./earth_globe.glb",
     "couleur": "#d9c8a1"
   },
   {
@@ -15,8 +13,6 @@
     "periode": "1914 – 1918",
     "url": "./Atelier-Premiere-GM.html",
     "vignette": "./premiere_gm.jpg",
-    "prop": "banner",
-    "gltfUrl": "./models/medieval_banner.glb",
     "couleur": "#b83e3e"
   },
   {
@@ -25,8 +21,6 @@
     "periode": "1919 – 1939",
     "url": "./Atelier-EntreDeuxGuerres.html",
     "vignette": "./entre_deux_guerres.jpg",
-    "prop": "radio",
-    "gltfUrl": "./philips_7-39_radio.glb",
     "couleur": "#caa77a"
   },
   {
@@ -35,8 +29,6 @@
     "periode": "1939 – 1945",
     "url": "./Atelier-Seconde-GM.html",
     "vignette": "./seconde_gm.jpg",
-    "prop": "banner",
-    "gltfUrl": "./models/flag.glb",
     "couleur": "#3f3f46"
   },
   {
@@ -45,8 +37,6 @@
     "periode": "1947 – 1991",
     "url": "./Atelier-GuerreFroide.html",
     "vignette": "./guerre_froide.jpeg",
-    "prop": "rocket",
-    "gltfUrl": "./Explorer_1.glb",
     "couleur": "#9fb7ff"
   },
   {
@@ -55,8 +45,6 @@
     "periode": "1951 →",
     "url": "./Atelier-ConstructionEuropeenne.html",
     "vignette": "./europe.jpg",
-    "prop": "banner",
-    "gltfUrl": "./column_base.glb",
     "couleur": "#1e3a8a"
   },
   {
@@ -65,8 +53,6 @@
     "periode": "1991 → aujourd'hui",
     "url": "./Atelier-MondeMultipolaire.html",
     "vignette": "./multipolaire.jpg",
-    "prop": "globe",
-    "gltfUrl": "./Voyager.glb",
     "couleur": "#2bb3a6"
   }
 ]
