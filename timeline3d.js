@@ -1,6 +1,4 @@
-// Musée 3D – LÉGER (affiches seules) + Zoom fort + double-clic focus + cadres dorés
-// Assets optionnels à la RACINE : floor_marble.jpg/png ou floor.jpg/png ; wall_plaster.jpg/png ou wall.jpg/png ; env.hdr
-// Compatible Chrome / Edge / Firefox / Safari.
+
 
 import * as THREE from 'https://esm.sh/three@0.160.0';
 import { OrbitControls } from 'https://esm.sh/three@0.160.0/examples/jsm/controls/OrbitControls.js';
@@ -75,7 +73,7 @@ controls.maxPolarAngle = Math.PI/2 - 0.05;
 controls.enablePan = false;
 controls.enableZoom = true;
 controls.zoomSpeed = 1.2;
-// Zoom vers le curseur si dispo (r155+)—sinon ignoré sans erreur
+// Zoom vers le curseur si dispo 
 if ('zoomToCursor' in controls) controls.zoomToCursor = true;
 
 // ====== fallback textures procédurales ======
