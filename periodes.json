@@ -4,7 +4,7 @@
     "titre": "Colonisation",
     "periode": "XIXe – début XXe",
     "url": "./Atelier-Colonisation.html",
-    "vignette": "./img/colonisation.jpg",
+    "vignette": "./img/colonisation2.jpg",
     "prop": "globe",
     "gltfUrl": "./models/globe.glb",
     "couleur": "#d9c8a1"
@@ -44,7 +44,7 @@
     "titre": "Guerre froide",
     "periode": "1947 – 1991",
     "url": "./Atelier-GuerreFroide.html",
-    "vignette": "./img/guerre_froide.jpg",
+    "vignette": "./img/guerre_froide.jpeg",
     "prop": "rocket",
     "gltfUrl": "./models/rocket.glb",
     "couleur": "#9fb7ff"
